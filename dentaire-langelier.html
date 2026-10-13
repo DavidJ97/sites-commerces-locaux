@@ -144,45 +144,60 @@ main{position:relative;z-index:1}
 .soin.urgence a{font-family:var(--large);font-variation-settings:"wdth" 130,"wght" 300;font-size:clamp(1.8rem,2.6vw,2.6rem);text-decoration:none;border-bottom:1px solid var(--gencive);align-self:flex-start}
 @media (max-width:760px){.ouverture{width:88vw;grid-template-columns:1fr;grid-template-rows:auto 1fr}.ouverture .texte{gap:18px}.soin{width:82vw}.salle{width:80vw}}
 
-/* ─── 2. soins : liste épinglée qui s'allume au défilement ─── */
-.carte-soins{height:100vh;height:100svh;overflow:hidden}
-.cs-grille{height:100%;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,5vw,90px);padding:clamp(96px,13vh,130px) var(--g) clamp(88px,12vh,116px)}
+/* ─── 2. soins : écran courbe en WebGL, fonte en colonnes, lentille, titre géant ───
+   Références : Wide (BL/S, Codrops 28 sept. 2026), lentille carrée RVB (Codrops 25 août 2026),
+   datamosh (Codrops 2 sept. 2026), Why Zero (Site du mois, sept. 2026) */
+.carte-soins{height:100vh;height:100svh;overflow:hidden;position:relative}
+.cs-gl{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.cs-grille{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,4vw,70px);padding:clamp(96px,13vh,130px) var(--g) clamp(92px,13vh,120px)}
 .cs-gauche{display:flex;flex-direction:column;justify-content:space-between;min-height:0}
-.cs-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
-.cs-tete h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.6rem,2.4vw,2.6rem);line-height:1;letter-spacing:-.02em;font-style:italic}
-.cs-tete p{max-width:30ch;color:var(--encre-douce);font-size:clamp(.95rem,1.05vw,1.05rem)}
-.cs-liste{list-style:none}
-.cs-liste button{all:unset;cursor:pointer;display:block;font-family:var(--serif);font-weight:400;font-variation-settings:"opsz" 96;font-size:clamp(2.4rem,min(5.6vw,9.5vh),6.4rem);line-height:1.02;letter-spacing:-.04em;color:var(--encre);opacity:.14;transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1);transform-origin:left}
-.cs-liste button:hover{opacity:.4}
-.cs-liste button:focus-visible{outline:2px solid var(--gencive-fonce);outline-offset:4px}
-.cs-liste li.actif button{opacity:1;transform:translateX(.35em)}
-.cs-liste li{position:relative}
-.cs-liste li::before{content:"";position:absolute;left:0;top:50%;width:.22em;height:.22em;margin-top:-.11em;border-radius:50%;background:var(--gencive-fonce);font-size:clamp(2.4rem,min(5.6vw,9.5vh),6.4rem);transform:scale(0);transition:transform .5s}
-.cs-liste li.actif::before{transform:scale(1)}
-.cs-liste li:last-child button{font-style:italic}
-.cs-droite{display:flex;flex-direction:column;gap:clamp(16px,2.6vh,28px);min-height:0}
+.cs-tete h2{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(1.7rem,2.6vw,2.8rem);line-height:1;letter-spacing:-.02em}
+.cs-tete p{margin-top:14px;max-width:28ch;color:var(--encre-douce);font-size:clamp(.95rem,1.05vw,1.05rem)}
+.cs-liste{list-style:none;counter-reset:soin}
+.cs-liste li{counter-increment:soin;border-top:1px solid var(--trait)}
+.cs-liste li:last-child{border-bottom:1px solid var(--trait)}
+.cs-liste button{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:14px;width:100%;padding:9px 0;font-family:var(--serif);font-size:clamp(1.15rem,1.7vw,1.7rem);line-height:1.1;letter-spacing:-.01em;color:var(--encre);opacity:.35;transition:opacity .4s}
+.cs-liste button::before{content:counter(soin,decimal-leading-zero);font-family:var(--large);font-variation-settings:"wdth" 120,"wght" 350;font-size:.6em;color:var(--encre-douce)}
+.cs-liste button:hover{opacity:.7}
+.cs-liste button:focus-visible{outline:2px solid var(--gencive-fonce);outline-offset:3px}
+.cs-liste li.actif button{opacity:1}
+.cs-liste li.actif button::before{color:var(--gencive-fonce)}
+.cs-droite{display:flex;flex-direction:column;gap:clamp(14px,2.4vh,26px);min-height:0}
 .cs-cadre{position:relative;flex:1;min-height:0;overflow:hidden;background:#d9dfdc}
+.gl .cs-cadre{background:transparent;overflow:visible}
+.gl .cs-img{visibility:hidden}
 .cs-img{position:absolute;inset:0;margin:0;clip-path:inset(100% 0 0 0)}
 .cs-img.vu{clip-path:inset(0 0 0 0)}
-.cs-img img{width:100%;height:115%;object-fit:cover;filter:grayscale(.25) contrast(1.18) brightness(.97)}
+.cs-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(.25) contrast(1.18) brightness(.97)}
 .cs-urgence{background:var(--encre);color:var(--porcelaine);display:flex;flex-direction:column;justify-content:flex-end;gap:14px;padding:clamp(20px,3vw,40px)}
 .cs-urgence span{font-family:var(--serif);font-style:italic;font-size:clamp(2rem,3.6vw,3.8rem);line-height:1}
 .cs-urgence a{font-family:var(--large);font-variation-settings:"wdth" 140,"wght" 250;font-size:clamp(1.8rem,3vw,3.2rem);text-decoration:none;color:var(--gencive);align-self:flex-start;border-bottom:1px solid var(--gencive)}
-.cs-textes{position:relative;min-height:clamp(96px,14vh,130px)}
+.cs-pied{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end}
+.cs-textes{position:relative;min-height:clamp(80px,11vh,110px)}
 .cs-texte{position:absolute;inset:0;opacity:0;transform:translateY(14px);transition:opacity .45s,transform .55s cubic-bezier(.2,.8,.2,1);pointer-events:none}
 .cs-texte.vu{opacity:1;transform:none;pointer-events:auto}
-.cs-texte p{font-size:clamp(1.05rem,1.3vw,1.25rem);max-width:34ch}
-.cs-texte .pour{font-size:.85rem;color:var(--encre-douce);display:flex;justify-content:space-between;gap:16px;padding-top:12px;border-top:1px solid var(--trait);margin-top:14px}
+.cs-texte p{font-size:clamp(1.05rem,1.3vw,1.25rem);max-width:36ch}
+.cs-texte .pour{font-size:.85rem;color:var(--encre-douce);display:flex;gap:16px;margin-top:10px}
 .cs-texte .pour b{font-weight:500;color:var(--encre)}
+.cs-texte a{color:var(--gencive-fonce)}
+.cs-compte{font-family:var(--large);font-variation-settings:"wdth" 55,"wght" 800;font-size:clamp(2.6rem,4.4vw,4.6rem);line-height:.8;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.cs-compte small{font-variation-settings:"wdth" 120,"wght" 300;font-size:.38em;color:var(--encre-douce);margin-left:4px}
 .cs-jauge{height:2px;background:var(--trait)}
 .cs-jauge i{display:block;height:100%;background:var(--encre);transform-origin:left;transform:scaleX(0)}
+/* le nom du soin traverse l'écran et inverse l'image */
+.cs-geant{position:absolute;z-index:3;left:0;right:auto;bottom:0;pointer-events:none;mix-blend-mode:difference;color:#EDF0EE;
+  font-family:var(--serif);font-weight:400;font-variation-settings:"opsz" 96;font-size:clamp(3.2rem,9.4vw,11.5rem);line-height:.86;letter-spacing:-.045em;text-align:right}
+.cs-geant .mot{display:inline-block;white-space:nowrap}
+.cs-geant .l{display:inline-block;will-change:transform}
+.cs-geant .rang{display:block;overflow:hidden;padding:.06em 0 .04em}
 @media (max-width:760px){
-  .cs-grille{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:16px;padding-top:84px}
+  .cs-grille{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;gap:14px;padding-top:80px}
   .cs-tete p{display:none}
-  .cs-liste button{font-size:clamp(1.7rem,8vw,2.4rem)}
-  .cs-liste li::before{font-size:clamp(1.7rem,8vw,2.4rem)}
-  .cs-cadre{flex:none;height:28vh}
-  .cs-gauche{gap:12px}
+  .cs-gauche{display:contents}
+  .cs-tete{order:0}.cs-droite{order:1}.cs-liste{order:2}
+  .cs-liste button{padding:6px 0;font-size:1.05rem}
+  .cs-cadre{flex:1}
+
 }
 /* ─── 3. vertical : la phrase qui se remplit ─── */
 .temoin{min-height:100vh;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(28px,5vw,90px);align-items:center;padding:clamp(90px,14vh,160px) var(--g)}
@@ -338,16 +353,20 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
           <figure class="cs-img" data-i="3"><img src="https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?auto=format&fit=crop&w=1100&q=75" alt="Explication d’une image dentaire sur une tablette" loading="lazy"></figure>
           <div class="cs-img cs-urgence" data-i="4"><span>Une urgence ?</span><a href="tel:+15142555511">514 255-5511</a></div>
         </div>
-        <div class="cs-textes">
+        <div class="cs-pied">
+          <div class="cs-textes">
           <div class="cs-texte" data-i="0"><p>Le suivi régulier qui évite les mauvaises surprises. On vous montre ce qu’on voit et on vous l’explique.</p><div class="pour"><span>Pour</span><b>Toute la famille</b></div></div>
           <div class="cs-texte" data-i="1"><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p><div class="pour"><span>Ce qu’on en dit</span><b>« Je n’ai presque rien senti »</b></div></div>
           <div class="cs-texte" data-i="2"><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p><div class="pour"><span>Pour</span><b>Dès la première dent</b></div></div>
           <div class="cs-texte" data-i="3"><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p><div class="pour"><span>Avant le soin</span><b>Prix annoncé</b></div></div>
-          <div class="cs-texte" data-i="4"><p>Une dent cassée, une douleur soudaine : appelez, on trouve une place rapidement.</p><div class="pour"><span>Même jour</span><b>Dans la mesure du possible</b></div></div>
+          <div class="cs-texte" data-i="4"><p>Une dent cassée, une douleur soudaine : appelez au <a href="tel:+15142555511">514 255-5511</a>, on trouve une place rapidement.</p><div class="pour"><span>Même jour</span><b>Dans la mesure du possible</b></div></div>
+        </div>
+          <span class="cs-compte" id="cs-compte">01<small>/ 05</small></span>
         </div>
         <div class="cs-jauge" aria-hidden="true"><i></i></div>
       </div>
     </div>
+    <div class="cs-geant" id="cs-geant" aria-hidden="true"></div>
   </section>
 
   <!-- 3. vertical, la phrase qui se remplit -->
@@ -466,28 +485,46 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
       cx.fillStyle="#fff"; cx.fillRect(pos.x-4.5,pos.y-4.5,9,9);
     });
   }
-  // soins : la section est épinglée, chaque tranche de défilement allume un soin
+  // soins : la section est épinglée ; l'état est partagé avec la scène WebGL (window.soinsEtat)
   (function(){
     const sec=document.getElementById("soins"); if(!sec) return;
     const btns=[...sec.querySelectorAll(".cs-liste button")], lis=btns.map(b=>b.parentElement);
     const imgs=[...sec.querySelectorAll(".cs-img")], txts=[...sec.querySelectorAll(".cs-texte")];
-    const jauge=sec.querySelector(".cs-jauge i"), n=btns.length, ind=document.getElementById("avancer"), indBar=ind&&ind.querySelector(".progres i");
-    let actif=-1;
+    const noms=btns.map(b=>b.textContent.trim());
+    const jauge=sec.querySelector(".cs-jauge i"), n=btns.length, compte=document.getElementById("cs-compte"), geant=document.getElementById("cs-geant");
+    const ind=document.getElementById("avancer"), indBar=ind&&ind.querySelector(".progres i");
+    const etat=window.soinsEtat={p:0,vel:0,n};
+    // titre géant : chaque mot reste entier, chaque lettre roule
+    const ecrire=t=>{ geant.innerHTML='<span class="rang">'+t.split(" ").map(m=>'<span class="mot">'+[...m].map(c=>'<span class="l">'+c+'</span>').join("")+'</span>').join(" ")+'</span>'; return geant.querySelectorAll(".l"); };
+    let tlTitre=null, actif=-1;
     function activer(i){
       if(i===actif) return; const prec=actif; actif=i;
       lis.forEach((l,k)=>l.classList.toggle("actif",k===i));
       txts.forEach((t,k)=>t.classList.toggle("vu",k===i));
-      imgs.forEach((im,k)=>{ im.style.zIndex = k===i ? 2 : (k===prec ? 1 : 0); });
-      const im=imgs[i];
-      gsap.fromTo(im,{clipPath: (prec<i ? "inset(100% 0% 0% 0%)" : "inset(0% 0% 100% 0%)")},{clipPath:"inset(0% 0% 0% 0%)",duration:.9,ease:"power3.inOut",onComplete:()=>imgs.forEach((x,k)=>{ if(k!==i) x.style.clipPath="inset(100% 0% 0% 0%)"; })});
-      const img=im.querySelector("img"); if(img) gsap.fromTo(img,{yPercent:prec<i?-8:0,scale:1.12},{yPercent:-4,scale:1,duration:1.2,ease:"power3.out"});
+      compte.firstChild.nodeValue=String(i+1).padStart(2,"0");
+      const sens = prec<i ? 1 : -1;
+      if(tlTitre) tlTitre.kill();
+      const anciennes=geant.querySelectorAll(".l");
+      tlTitre=gsap.timeline();
+      if(anciennes.length) tlTitre.to(anciennes,{yPercent:-115*sens,rotate:-8*sens,duration:.32,stagger:.012,ease:"power2.in"});
+      tlTitre.add(()=>{ const ls=ecrire(noms[i]); gsap.fromTo(ls,{yPercent:115*sens,rotate:8*sens},{yPercent:0,rotate:0,duration:.7,stagger:.018,ease:"expo.out"}); });
+      // repli sans WebGL : rideau sur les images du DOM
+      if(!sec.classList.contains("gl")){
+        imgs.forEach((im,k)=>{ im.style.zIndex = k===i ? 2 : (k===prec ? 1 : 0); });
+        gsap.fromTo(imgs[i],{clipPath:(sens>0?"inset(100% 0% 0% 0%)":"inset(0% 0% 100% 0%)")},{clipPath:"inset(0% 0% 0% 0%)",duration:.9,ease:"power3.inOut"});
+      }
     }
-    const longueur=()=>innerHeight*.7*n;
+    const longueur=()=>innerHeight*.85*n;
     const st=ScrollTrigger.create({trigger:sec,start:"top top",end:()=>"+="+longueur(),pin:true,anticipatePin:1,invalidateOnRefresh:true,
-      onUpdate:x=>{ activer(Math.min(n-1,Math.floor(x.progress*n*.999))); jauge.style.transform="scaleX("+x.progress+")"; if(indBar) indBar.style.transform="scaleX("+x.progress+")"; ind&&ind.classList.toggle("actif",x.isActive&&x.progress<.97); },
+      onUpdate:x=>{
+        etat.p=x.progress*(n-1); etat.vel=Math.max(-1,Math.min(1,x.getVelocity()/2600));
+        activer(Math.min(n-1,Math.floor(etat.p+.25)));
+        jauge.style.transform="scaleX("+x.progress+")"; if(indBar) indBar.style.transform="scaleX("+x.progress+")";
+        ind&&ind.classList.toggle("actif",x.isActive&&x.progress<.97);
+      },
       onToggle:x=>ind&&ind.classList.toggle("actif",x.isActive&&x.progress<.97)});
     activer(0);
-    btns.forEach((b,i)=>b.addEventListener("click",()=>{ const y=st.start+(i+.5)/n*(st.end-st.start); window.lenisSite ? window.lenisSite.scrollTo(y) : scrollTo({top:y,behavior:"smooth"}); }));
+    btns.forEach((b,i)=>b.addEventListener("click",()=>{ const y=st.start+i/(n-1)*(st.end-st.start); window.lenisSite ? window.lenisSite.scrollTo(y) : scrollTo({top:y,behavior:"smooth"}); }));
   })();
   document.querySelectorAll(".horiz").forEach(sec=>{
     const piste=sec.querySelector(".piste");
@@ -987,6 +1024,132 @@ const attente = setInterval(()=>{ if(dent){ clearInterval(attente); entreeScene(
 setTimeout(()=>{ if(!dent){ dent = dentIntegree(); stage.add(dent); } }, 2500);
 boucle();
 }
+</script>
+<script type="module">
+/* soins : écran courbe, fonte en colonnes entre deux soins, lentille carrée RVB sous le curseur */
+import * as THREE from "three";
+(function(){
+  const sec=document.getElementById("soins"); if(!sec || !window.soinsEtat) return;
+  const cadre=sec.querySelector(".cs-cadre");
+  const canvas=document.createElement("canvas"); canvas.className="cs-gl"; canvas.setAttribute("aria-hidden","true"); sec.prepend(canvas);
+  let r; try{ r=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true}); }catch(e){ canvas.remove(); return; }
+  r.setPixelRatio(Math.min(devicePixelRatio,2)); r.outputColorSpace=THREE.SRGBColorSpace;
+  const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(30,1,1,20000);
+
+  // textures : photos des soins + panneau d'urgence dessiné
+  const sources=[...sec.querySelectorAll(".cs-img")].map(el=>{ const im=el.querySelector("img"); return im ? im.currentSrc||im.src : null; });
+  const loader=new THREE.TextureLoader(); loader.setCrossOrigin("anonymous");
+  const tex=[], asp=[]; let charges=0, echec=false;
+  function panneauUrgence(){
+    const c=document.createElement("canvas"); c.width=1600; c.height=1000; const g=c.getContext("2d");
+    g.fillStyle="#13201C"; g.fillRect(0,0,c.width,c.height);
+    g.strokeStyle="rgba(227,156,155,.32)"; g.lineWidth=2; for(let i=0;i<16;i++){ g.beginPath(); g.arc(1180,430,60+i*44,0,Math.PI*2); g.stroke(); }
+    g.fillStyle="#E39C9B"; g.beginPath(); g.arc(1180,430,22,0,Math.PI*2); g.fill();
+    g.fillStyle="#EDF0EE"; g.textAlign="left"; g.font='italic 400 150px "Bodoni Moda", Didot, Georgia, serif'; g.fillText("Une urgence ?",110,520);
+    g.fillStyle="#E39C9B"; g.font='300 104px Anybody, system-ui, sans-serif'; g.fillText("514 255-5511",114,690);
+    const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+  }
+  sources.forEach((src,i)=>{
+    if(!src){ tex[i]=panneauUrgence(); asp[i]=1.6; charges++; return; }
+    tex[i]=loader.load(src,t=>{ t.colorSpace=THREE.SRGBColorSpace; asp[i]=t.image.width/t.image.height; charges++; if(charges>=1 && !echec) sec.classList.add("gl"); },undefined,()=>{ echec=true; sec.classList.remove("gl"); });
+    asp[i]=1;
+  });
+  document.fonts && document.fonts.ready.then(()=>{ const k=sources.indexOf(null); if(k>=0){ tex[k]=panneauUrgence(); } });
+
+  const mat=new THREE.ShaderMaterial({
+    uniforms:{uA:{value:null},uB:{value:null},uMix:{value:0},uVel:{value:0},uT:{value:0},uLens:{value:0},uMouse:{value:new THREE.Vector2(.5,.5)},
+      uAspA:{value:1},uAspB:{value:1},uPlane:{value:1},uW:{value:1},uH:{value:1},uCurve:{value:.09}},
+    vertexShader:`uniform float uVel,uMix,uW,uH,uCurve,uT;varying vec2 vUv;
+      void main(){vUv=uv;vec3 p=position;float xn=p.x/uW*2.,yn=p.y/uH*2.;
+        p.z+=xn*xn*uCurve*uW;
+        p.z+=sin(yn*1.5708)*uVel*uH*.16;
+        p.z+=sin(3.14159*uMix)*(1.-yn*yn)*uH*.07;
+        p.y+=sin(xn*3.+uT)*uVel*uH*.02;
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
+    fragmentShader:`precision highp float;
+      uniform sampler2D uA,uB;uniform float uMix,uVel,uT,uLens,uAspA,uAspB,uPlane;uniform vec2 uMouse;varying vec2 vUv;
+      float h(float x){return fract(sin(x*127.1)*43758.5453);}
+      float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1,1)),f.x),f.y);}
+      vec2 cover(vec2 uv,float pa,float ia){vec2 s=pa>ia?vec2(1.,ia/pa):vec2(pa/ia,1.);return (uv-.5)*s+.5;}
+      vec3 lit(sampler2D t,vec2 uv,float a,float sp){uv=cover(uv,uPlane,a);
+        vec3 c=vec3(texture2D(t,uv+vec2(sp,0.)).r,texture2D(t,uv).g,texture2D(t,uv-vec2(sp,0.)).b);
+        float g=dot(c,vec3(.299,.587,.114));c=mix(vec3(g),c,.78);c=(c-.5)*1.16+.5;return c;}
+      void main(){
+        vec2 uv=vUv;
+        // lentille carrée qui suit le curseur (grossit et sépare les couleurs)
+        vec2 d=(uv-uMouse)*vec2(uPlane,1.);float m=max(abs(d.x),abs(d.y));
+        float inL=uLens*(1.-smoothstep(.105,.11,m));
+        uv=mix(uv,uMouse+(uv-uMouse)*.55,inL);
+        // fonte en colonnes : chaque colonne tombe à sa vitesse, l'image suivante descend du haut
+        float cols=34.;float c=floor(vUv.x*cols);float r=h(c+1.);
+        float loc=clamp(uMix*1.75-r*.75,0.,1.);loc=loc*loc*(3.-2.*loc);
+        float k=1.+r*.55;
+        float mid=sin(3.14159*uMix);
+        float ond=(n2(vec2(c*.37,uT*.6))-.5)*.05*mid;
+        float sp=.003+mid*.018*(.4+r)+abs(uVel)*.02+inL*.014;
+        vec2 uvA=uv+vec2(ond,-loc*k);
+        vec2 uvB=uv+vec2(ond,(1.-loc)*k);
+        vec3 col;
+        if(uvB.y<=1.) col=lit(uB,uvB,uAspB,sp);
+        else if(uvA.y>=0.) col=lit(uA,uvA,uAspA,sp);
+        else col=lit(uB,vec2(uv.x,.995),uAspB,sp)*.85;
+        // filet rose sur le front de l'image qui arrive
+        float front=1.-(1.-loc)*k;float f=1.-smoothstep(0.,.004,abs(uv.y-front));
+        col=mix(col,vec3(.89,.61,.61),f*step(.001,uMix)*step(uMix,.999));
+        // cadre de la lentille
+        float bord=(1.-smoothstep(.0,.0025,abs(m-.108)))*uLens;col=mix(col,vec3(.93,.94,.93),bord);
+        // grain
+        col+=(h2(vUv*1000.+uT)-.5)*.045;
+        gl_FragColor=vec4(col,1.);}`
+  });
+  const plan=new THREE.Mesh(new THREE.PlaneGeometry(1,1,80,40),mat); scene.add(plan);
+
+  let W=1,H=1;
+  function caler(){
+    W=sec.clientWidth; H=sec.clientHeight; r.setSize(W,H,false);
+    cam.aspect=W/H; cam.position.set(0,0,(H/2)/Math.tan(THREE.MathUtils.degToRad(15))); cam.updateProjectionMatrix();
+    const R=cadre.getBoundingClientRect(), S=sec.getBoundingClientRect();
+    const w=R.width, hh=R.height, cx=R.left-S.left+w/2, cy=R.top-S.top+hh/2;
+    plan.geometry.dispose(); plan.geometry=new THREE.PlaneGeometry(w,hh,80,40);
+    plan.position.set(cx-W/2, -(cy-H/2), 0);
+    mat.uniforms.uW.value=w; mat.uniforms.uH.value=hh; mat.uniforms.uPlane.value=w/hh;
+    mat.uniforms.uCurve.value = W<760 ? .05 : .09;
+    // le nom du soin s'aligne sur le bord droit de l'écran et mord sur son bas
+    const geant=document.getElementById("cs-geant");
+    geant.style.width=(w*1.12)+"px"; geant.style.left=(R.right-S.left-w*1.12)+"px";
+    const fs=Math.min(w*.105, H*.15); geant.style.fontSize=fs+"px";
+    geant.style.bottom=(S.bottom-R.bottom + fs*.12)+"px";
+  }
+  addEventListener("resize",caler); caler(); document.fonts && document.fonts.ready.then(caler);
+  if(window.ScrollTrigger) ScrollTrigger.addEventListener("refresh",caler);
+
+  // curseur
+  const souris={x:.5,y:.5,tx:.5,ty:.5,l:0,tl:0};
+  if(!matchMedia("(pointer: coarse)").matches){
+    sec.addEventListener("pointermove",e=>{ const R=cadre.getBoundingClientRect(); souris.tx=(e.clientX-R.left)/R.width; souris.ty=1-(e.clientY-R.top)/R.height; souris.tl=(souris.tx>0&&souris.tx<1&&souris.ty>0&&souris.ty<1)?1:0; });
+    sec.addEventListener("pointerleave",()=>souris.tl=0);
+  }
+
+  let vu=false; new IntersectionObserver(es=>{ vu=es[0].isIntersecting; if(vu) boucle(); },{rootMargin:"200px"}).observe(sec);
+  const etat=window.soinsEtat, horloge=new THREE.Clock(); let vel=0, enCours=false;
+  function boucle(){
+    if(enCours) return; enCours=true;
+    requestAnimationFrame(function f(){
+      if(!vu){ enCours=false; return; }
+      const t=horloge.getElapsedTime();
+      const p=Math.max(0,Math.min(etat.n-1,etat.p)), i=Math.min(etat.n-2,Math.floor(p)), fr=p-i;
+      const mix = p>=etat.n-1 ? 1 : THREE.MathUtils.smoothstep(fr,.5,.95);
+      const u=mat.uniforms;
+      u.uA.value=tex[i]; u.uB.value=tex[i+1]; u.uAspA.value=asp[i]||1; u.uAspB.value=asp[i+1]||1; u.uMix.value=mix;
+      vel+=(etat.vel-vel)*.08; u.uVel.value=vel; u.uT.value=t;
+      souris.x+=(souris.tx-souris.x)*.18; souris.y+=(souris.ty-souris.y)*.18; souris.l+=(souris.tl-souris.l)*.12;
+      u.uMouse.value.set(souris.x,souris.y); u.uLens.value=souris.l;
+      r.render(scene,cam);
+      requestAnimationFrame(f);
+    });
+  }
+})();
 </script>
 </body>
 </html>
