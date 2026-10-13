@@ -79,6 +79,11 @@ main{position:relative;z-index:1}
 .ch h1{font-size:clamp(2.5rem,8.4vw,9.4rem)}
 .lecteur{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .levres{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.bouche{position:absolute;inset:0;overflow:hidden;pointer-events:none;will-change:transform,opacity,filter}
+.bouche img{position:absolute;left:50%;top:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);
+  mix-blend-mode:lighten;filter:contrast(1.06) saturate(1.05);
+  -webkit-mask-image:radial-gradient(60% 52% at 50% 50%,#000 55%,transparent 100%);mask-image:radial-gradient(60% 52% at 50% 50%,#000 55%,transparent 100%)}
+@media (max-width:760px){.bouche img{width:175vw;height:auto;object-fit:contain}}
 .levres text{font-family:var(--serif);fill:var(--porcelaine);letter-spacing:-.035em}
 .levres text.ital{font-style:italic}
 .levres text.fine{fill:var(--brume)}
@@ -248,6 +253,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
     <div class="collant">
       <div class="ch" id="ch0">
         <h1 class="lecteur">Centre Dentaire Langelier : trois générations de sourires à Saint-Léonard.</h1>
+        <div class="bouche" id="bouche" aria-hidden="true"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3FAHB64EMrDf6yqhpJnm67SRxS5/hf_20261013_025634_4ea08f4f-728e-44ff-9e17-97f31516e8b9.png" alt=""></div>
         <svg class="levres" id="levres" aria-hidden="true"></svg>
         <div class="reperes">
           <span><b>Centre Dentaire Langelier</b>7335, boulevard Langelier</span>
@@ -706,7 +712,7 @@ const grain = new ShaderPass({
 composer.addPass(grain);
 
 /* mise en scène pilotée par le défilement */
-const S = { tx:pos36.x, ty:pos36.y, ech:0, rotY:0, rotX:.1, spin:0, orb:0, rayon:7, haut:.15, coupeE:4, coupeD:4, etiq:0, scan:1.6, ecart:0 };
+const S = { tx:estMobile()?.25:.95, ty:estMobile()?.35:-.12, ech:0, rotY:0, rotX:.1, spin:0, orb:0, rayon:7, haut:.15, coupeE:4, coupeD:4, etiq:0, scan:1.6, ecart:0 };
 const L = {}; for (const k in S) L[k] = S[k];
 const souris = {x:0,y:0,lx:0,ly:0};
 if (estMobile()) { S.rayon = 7.6; L.rayon = 7.6; }
@@ -721,8 +727,8 @@ function construireLevres(){
   camera.position.set(0,.15,L.rayon); camera.lookAt(0,0,0); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
   const v=new THREE.Vector3(0,sourire.position.y,0).project(camera), cy=(-v.y*.5+.5)*H;
   const lignes = mob
-    ? [{t:"Trois générations",y0:cy-H*.17,creux:H*.09,f:.064},{t:"de sourires",y0:cy+H*.13,creux:H*.07,f:.1,ital:1},{t:"à Saint\u2011Léonard.",y0:cy+H*.21,creux:H*.1,f:.085}]
-    : [{t:"Trois générations de sourires",y0:cy-H*.3,creux:H*.17,f:.057},{t:"à Saint\u2011Léonard.",y0:cy+H*.2,creux:H*.24,f:.084,ital:1}];
+    ? [{t:"Trois générations",y0:H*.37,creux:-H*.05,f:.07},{t:"de sourires",y0:H*.62,creux:H*.05,f:.1,ital:1},{t:"à Saint\u2011Léonard.",y0:H*.7,creux:H*.06,f:.085,ital:1}]
+    : [{t:"Trois générations de sourires",y0:H*.31,creux:-H*.11,f:.05},{t:"à Saint\u2011Léonard.",y0:H*.71,creux:H*.12,f:.074,ital:1}];
   const tD = mob ? W*.118 : Math.min(W*.062,H*.13);
   if (levres.length !== lignes.length){
     svg.innerHTML=""; levres.length=0;
@@ -771,7 +777,8 @@ if (gsap) {
   const tl = gsap.timeline({defaults:{ease:"power2.inOut"}, scrollTrigger:{trigger:"#recit",start:"top top",end:"bottom bottom",scrub:1.1}});
   // 0 : le sourire s'ouvre, les lèvres de texte se redressent, la 36 s'avance
   tl.addLabel("c0", .35);
-  tl.to(S,{ecart:1, duration:1.3, ease:"power2.in"},"c0")
+  // on plonge dans le sourire : la photo s'agrandit vers les dents de droite et se dissout
+  tl.to("#bouche",{scale:m?2.2:2.8, opacity:0, filter:"blur(14px)", transformOrigin:m?"60% 52%":"64% 54%", duration:1.4, ease:"power2.in"},"c0")
     .to(S,{ech:m?.55:1, tx:m?0:1.25, ty:m?.75:0, rotY:-.5, rotX:.25, spin:1, duration:1.5, ease:"power3.inOut"},"c0+=.15");
   tl.to(etatLevres,{p:1,duration:1.1,ease:"power3.inOut",onUpdate:dessinerLevres},"c0");
   tl.addLabel("c1", "c0+=2.6");
@@ -832,7 +839,7 @@ function boucle(){
     camera.lookAt(0,0,0);
     // le sourire s'ouvre : les dents s'écartent et tombent, les gencives se retirent
     const e = L.ecart;
-    sourire.visible = e < .97;
+    sourire.visible = false;
     if (sourire.visible){
       dentsSourire.forEach(d=>{
         const k = Math.min(1, Math.max(0, e*1.25 - d.rnd*.25));
