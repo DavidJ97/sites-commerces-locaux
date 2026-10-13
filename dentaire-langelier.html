@@ -144,6 +144,46 @@ main{position:relative;z-index:1}
 .soin.urgence a{font-family:var(--large);font-variation-settings:"wdth" 130,"wght" 300;font-size:clamp(1.8rem,2.6vw,2.6rem);text-decoration:none;border-bottom:1px solid var(--gencive);align-self:flex-start}
 @media (max-width:760px){.ouverture{width:88vw;grid-template-columns:1fr;grid-template-rows:auto 1fr}.ouverture .texte{gap:18px}.soin{width:82vw}.salle{width:80vw}}
 
+/* ─── 2. soins : liste épinglée qui s'allume au défilement ─── */
+.carte-soins{height:100vh;height:100svh;overflow:hidden}
+.cs-grille{height:100%;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(24px,5vw,90px);padding:clamp(96px,13vh,130px) var(--g) clamp(88px,12vh,116px)}
+.cs-gauche{display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.cs-tete{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.cs-tete h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.6rem,2.4vw,2.6rem);line-height:1;letter-spacing:-.02em;font-style:italic}
+.cs-tete p{max-width:30ch;color:var(--encre-douce);font-size:clamp(.95rem,1.05vw,1.05rem)}
+.cs-liste{list-style:none}
+.cs-liste button{all:unset;cursor:pointer;display:block;font-family:var(--serif);font-weight:400;font-variation-settings:"opsz" 96;font-size:clamp(2.4rem,min(5.6vw,9.5vh),6.4rem);line-height:1.02;letter-spacing:-.04em;color:var(--encre);opacity:.14;transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1);transform-origin:left}
+.cs-liste button:hover{opacity:.4}
+.cs-liste button:focus-visible{outline:2px solid var(--gencive-fonce);outline-offset:4px}
+.cs-liste li.actif button{opacity:1;transform:translateX(.35em)}
+.cs-liste li{position:relative}
+.cs-liste li::before{content:"";position:absolute;left:0;top:50%;width:.22em;height:.22em;margin-top:-.11em;border-radius:50%;background:var(--gencive-fonce);font-size:clamp(2.4rem,min(5.6vw,9.5vh),6.4rem);transform:scale(0);transition:transform .5s}
+.cs-liste li.actif::before{transform:scale(1)}
+.cs-liste li:last-child button{font-style:italic}
+.cs-droite{display:flex;flex-direction:column;gap:clamp(16px,2.6vh,28px);min-height:0}
+.cs-cadre{position:relative;flex:1;min-height:0;overflow:hidden;background:#d9dfdc}
+.cs-img{position:absolute;inset:0;margin:0;clip-path:inset(100% 0 0 0)}
+.cs-img.vu{clip-path:inset(0 0 0 0)}
+.cs-img img{width:100%;height:115%;object-fit:cover;filter:grayscale(.25) contrast(1.18) brightness(.97)}
+.cs-urgence{background:var(--encre);color:var(--porcelaine);display:flex;flex-direction:column;justify-content:flex-end;gap:14px;padding:clamp(20px,3vw,40px)}
+.cs-urgence span{font-family:var(--serif);font-style:italic;font-size:clamp(2rem,3.6vw,3.8rem);line-height:1}
+.cs-urgence a{font-family:var(--large);font-variation-settings:"wdth" 140,"wght" 250;font-size:clamp(1.8rem,3vw,3.2rem);text-decoration:none;color:var(--gencive);align-self:flex-start;border-bottom:1px solid var(--gencive)}
+.cs-textes{position:relative;min-height:clamp(96px,14vh,130px)}
+.cs-texte{position:absolute;inset:0;opacity:0;transform:translateY(14px);transition:opacity .45s,transform .55s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.cs-texte.vu{opacity:1;transform:none;pointer-events:auto}
+.cs-texte p{font-size:clamp(1.05rem,1.3vw,1.25rem);max-width:34ch}
+.cs-texte .pour{font-size:.85rem;color:var(--encre-douce);display:flex;justify-content:space-between;gap:16px;padding-top:12px;border-top:1px solid var(--trait);margin-top:14px}
+.cs-texte .pour b{font-weight:500;color:var(--encre)}
+.cs-jauge{height:2px;background:var(--trait)}
+.cs-jauge i{display:block;height:100%;background:var(--encre);transform-origin:left;transform:scaleX(0)}
+@media (max-width:760px){
+  .cs-grille{grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:16px;padding-top:84px}
+  .cs-tete p{display:none}
+  .cs-liste button{font-size:clamp(1.7rem,8vw,2.4rem)}
+  .cs-liste li::before{font-size:clamp(1.7rem,8vw,2.4rem)}
+  .cs-cadre{flex:none;height:28vh}
+  .cs-gauche{gap:12px}
+}
 /* ─── 3. vertical : la phrase qui se remplit ─── */
 .temoin{min-height:100vh;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(28px,5vw,90px);align-items:center;padding:clamp(90px,14vh,160px) var(--g)}
 .temoin .photo{height:min(78vh,760px);flex:none}
@@ -277,40 +317,36 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
   </section>
 
   <div class="pixels" id="pixels" aria-hidden="true"></div>
-  <!-- 2. horizontal, les soins -->
-  <section class="clair horiz" id="soins" aria-label="Nos soins">
-    <div class="piste">
-      <div class="panneau ouverture">
-        <div class="texte">
-          <h2>Ce qu’on fait pour vous</h2>
-          <p>Du premier rendez-vous de votre enfant au traitement plus complexe, tout se fait ici, avec la même équipe.</p>
-        </div>
-        <figure class="photo"><img src="https://images.unsplash.com/photo-1728342057953-94bfad8f0e7e?auto=format&fit=crop&w=1400&q=75" alt="Fauteuil dentaire blanc près d’une fenêtre"></figure>
+  <!-- 2. vertical épinglé, les soins : la liste s'allume au défilement -->
+  <section class="clair carte-soins" id="soins" aria-label="Nos soins">
+    <div class="cs-grille">
+      <div class="cs-gauche">
+        <div class="cs-tete"><h2>Ce qu’on fait pour vous</h2><p>Du premier rendez-vous de votre enfant au traitement plus complexe, tout se fait ici, avec la même équipe.</p></div>
+        <ul class="cs-liste">
+        <li><button type="button" data-i="0">Examens et nettoyage</button></li>
+        <li><button type="button" data-i="1">Traitements de canal</button></li>
+        <li><button type="button" data-i="2">Soins pour enfants</button></li>
+        <li><button type="button" data-i="3">Prix et assurances</button></li>
+        <li><button type="button" data-i="4">Urgences</button></li>
+        </ul>
       </div>
-      <article class="panneau soin">
-        <h3>Examens et nettoyage</h3>
-        <figure class="photo"><img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1000&q=75" alt="Examen dentaire au miroir" loading="lazy"></figure>
-        <div><p>Le suivi régulier qui évite les mauvaises surprises. On vous explique ce qu’on voit.</p><div class="pour"><span>Pour</span><b>Toute la famille</b></div></div>
-      </article>
-      <article class="panneau soin">
-        <h3>Traitements de canal</h3>
-        <figure class="photo"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=75" alt="Dentiste qui lit des radiographies sur un négatoscope" loading="lazy"></figure>
-        <div><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p><div class="pour"><span>Ce qu’on en dit</span><b>« Je n’ai presque rien senti »</b></div></div>
-      </article>
-      <article class="panneau soin">
-        <h3>Soins pour enfants</h3>
-        <figure class="photo"><img src="https://images.unsplash.com/photo-1758205307836-0829c799890b?auto=format&fit=crop&w=1000&q=75" alt="Dentiste qui examine les dents d’un jeune garçon" loading="lazy"></figure>
-        <div><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p><div class="pour"><span>Pour</span><b>Dès la première dent</b></div></div>
-      </article>
-      <article class="panneau soin">
-        <h3>Prix et assurances</h3>
-        <figure class="photo"><img src="https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?auto=format&fit=crop&w=1000&q=75" alt="Explication d’une image dentaire sur une tablette" loading="lazy"></figure>
-        <div><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p><div class="pour"><span>Avant le soin</span><b>Prix annoncé</b></div></div>
-      </article>
-      <article class="panneau soin urgence">
-        <h3>Une urgence&nbsp;?</h3>
-        <div><p>Une dent cassée, une douleur soudaine&nbsp;: appelez, on trouve une place rapidement.</p><a href="tel:+15142555511">514 255-5511</a></div>
-      </article>
+      <div class="cs-droite">
+        <div class="cs-cadre">
+          <figure class="cs-img" data-i="0"><img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1100&q=75" alt="Examen dentaire au miroir" loading="lazy"></figure>
+          <figure class="cs-img" data-i="1"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1100&q=75" alt="Dentiste qui lit des radiographies" loading="lazy"></figure>
+          <figure class="cs-img" data-i="2"><img src="https://images.unsplash.com/photo-1758205307836-0829c799890b?auto=format&fit=crop&w=1100&q=75" alt="Dentiste qui examine les dents d’un jeune garçon" loading="lazy"></figure>
+          <figure class="cs-img" data-i="3"><img src="https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?auto=format&fit=crop&w=1100&q=75" alt="Explication d’une image dentaire sur une tablette" loading="lazy"></figure>
+          <div class="cs-img cs-urgence" data-i="4"><span>Une urgence ?</span><a href="tel:+15142555511">514 255-5511</a></div>
+        </div>
+        <div class="cs-textes">
+          <div class="cs-texte" data-i="0"><p>Le suivi régulier qui évite les mauvaises surprises. On vous montre ce qu’on voit et on vous l’explique.</p><div class="pour"><span>Pour</span><b>Toute la famille</b></div></div>
+          <div class="cs-texte" data-i="1"><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p><div class="pour"><span>Ce qu’on en dit</span><b>« Je n’ai presque rien senti »</b></div></div>
+          <div class="cs-texte" data-i="2"><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p><div class="pour"><span>Pour</span><b>Dès la première dent</b></div></div>
+          <div class="cs-texte" data-i="3"><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p><div class="pour"><span>Avant le soin</span><b>Prix annoncé</b></div></div>
+          <div class="cs-texte" data-i="4"><p>Une dent cassée, une douleur soudaine : appelez, on trouve une place rapidement.</p><div class="pour"><span>Même jour</span><b>Dans la mesure du possible</b></div></div>
+        </div>
+        <div class="cs-jauge" aria-hidden="true"><i></i></div>
+      </div>
     </div>
   </section>
 
@@ -430,6 +466,29 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
       cx.fillStyle="#fff"; cx.fillRect(pos.x-4.5,pos.y-4.5,9,9);
     });
   }
+  // soins : la section est épinglée, chaque tranche de défilement allume un soin
+  (function(){
+    const sec=document.getElementById("soins"); if(!sec) return;
+    const btns=[...sec.querySelectorAll(".cs-liste button")], lis=btns.map(b=>b.parentElement);
+    const imgs=[...sec.querySelectorAll(".cs-img")], txts=[...sec.querySelectorAll(".cs-texte")];
+    const jauge=sec.querySelector(".cs-jauge i"), n=btns.length, ind=document.getElementById("avancer"), indBar=ind&&ind.querySelector(".progres i");
+    let actif=-1;
+    function activer(i){
+      if(i===actif) return; const prec=actif; actif=i;
+      lis.forEach((l,k)=>l.classList.toggle("actif",k===i));
+      txts.forEach((t,k)=>t.classList.toggle("vu",k===i));
+      imgs.forEach((im,k)=>{ im.style.zIndex = k===i ? 2 : (k===prec ? 1 : 0); });
+      const im=imgs[i];
+      gsap.fromTo(im,{clipPath: (prec<i ? "inset(100% 0% 0% 0%)" : "inset(0% 0% 100% 0%)")},{clipPath:"inset(0% 0% 0% 0%)",duration:.9,ease:"power3.inOut",onComplete:()=>imgs.forEach((x,k)=>{ if(k!==i) x.style.clipPath="inset(100% 0% 0% 0%)"; })});
+      const img=im.querySelector("img"); if(img) gsap.fromTo(img,{yPercent:prec<i?-8:0,scale:1.12},{yPercent:-4,scale:1,duration:1.2,ease:"power3.out"});
+    }
+    const longueur=()=>innerHeight*.7*n;
+    const st=ScrollTrigger.create({trigger:sec,start:"top top",end:()=>"+="+longueur(),pin:true,anticipatePin:1,invalidateOnRefresh:true,
+      onUpdate:x=>{ activer(Math.min(n-1,Math.floor(x.progress*n*.999))); jauge.style.transform="scaleX("+x.progress+")"; if(indBar) indBar.style.transform="scaleX("+x.progress+")"; ind&&ind.classList.toggle("actif",x.isActive&&x.progress<.97); },
+      onToggle:x=>ind&&ind.classList.toggle("actif",x.isActive&&x.progress<.97)});
+    activer(0);
+    btns.forEach((b,i)=>b.addEventListener("click",()=>{ const y=st.start+(i+.5)/n*(st.end-st.start); window.lenisSite ? window.lenisSite.scrollTo(y) : scrollTo({top:y,behavior:"smooth"}); }));
+  })();
   document.querySelectorAll(".horiz").forEach(sec=>{
     const piste=sec.querySelector(".piste");
     const dist=()=>Math.max(0,piste.scrollWidth-innerWidth);
@@ -487,7 +546,7 @@ const compteur = pre.querySelector(".compteur"), barre = pre.querySelector(".bar
 
 let lenis = null;
 if (gsap && window.Lenis && !reduit) {
-  lenis = new Lenis({duration:1.2, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
+  lenis = new Lenis({duration:1.2, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))}); window.lenisSite = lenis;
   lenis.on("scroll", ScrollTrigger.update);
   gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
   document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{
