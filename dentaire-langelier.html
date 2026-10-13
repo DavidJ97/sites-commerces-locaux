@@ -72,7 +72,7 @@ header.cache{transform:translateY(-110%)}
 main{position:relative;z-index:1}
 
 /* ─── 1. récit vertical sur la scène 3D ─── */
-.recit{height:640vh;position:relative}
+.recit{height:420vh;position:relative}
 .collant{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
 .ch{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:120px var(--g) clamp(34px,6vh,64px);pointer-events:none}
 .ch h1,.ch h2{font-family:var(--serif);font-weight:400;letter-spacing:-.04em;line-height:.86}
@@ -108,10 +108,19 @@ main{position:relative;z-index:1}
 .etiquette small{display:block;color:var(--brume);font-size:.8rem}
 .etiquette.pulpe::before{background:var(--gencive)}
 @media (max-width:760px){.etiquette{display:none}}
-.defile{position:absolute;right:var(--g);bottom:clamp(34px,6vh,64px);font-size:.82rem;color:var(--brume);display:flex;align-items:center;gap:12px}
+.defile{position:absolute;right:var(--g);bottom:clamp(34px,6vh,64px);font-size:1rem;color:var(--porcelaine);display:flex;align-items:center;gap:14px}
+.defile .souris{width:26px}
+.defile .pouce{width:30px}
+.pouce{flex:none;width:clamp(36px,4vw,52px);height:auto;color:var(--porcelaine);overflow:visible}
+.pouce-geste{animation:glisse 1.8s cubic-bezier(.65,0,.35,1) infinite}
+.pouce-fleche{animation:fleche 1.8s ease-in-out infinite}
+@keyframes glisse{0%,15%{transform:translateY(10px);opacity:0}30%{opacity:1}75%{transform:translateY(-8px);opacity:1}100%{transform:translateY(-12px);opacity:0}}
+@keyframes fleche{0%,40%{opacity:0;transform:translateY(4px)}60%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-4px)}}
+.pouce,.txt-pouce{display:none}
+@media (pointer:coarse){.souris,.txt-souris{display:none!important}.pouce{display:block}.txt-pouce{display:inline}}
 .defile::after{content:"";width:1px;height:46px;background:linear-gradient(var(--brume),transparent);animation:goutte 2.2s ease-in-out infinite}
 @keyframes goutte{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-@media (max-width:760px){.defile{display:none}}
+@media (max-width:760px){.defile{left:var(--g);right:auto;bottom:auto;top:calc(100% - 40px)}}
 
 /* ─── sections claires ─── */
 .clair{position:relative;z-index:2;background:var(--porcelaine);color:var(--encre)}
@@ -224,8 +233,8 @@ main{position:relative;z-index:1}
 .jour{width:clamp(170px,17vw,280px);border-left:1px solid var(--trait);gap:10px}
 .jour .nom{font-size:.95rem;color:var(--encre-douce)}
 .jour .h{font-family:var(--large);font-variation-settings:"wdth" 55,"wght" 750;font-size:clamp(2.6rem,4.2vw,4.6rem);line-height:.9;letter-spacing:-.03em;white-space:nowrap}
-.jour .barre-h{height:calc(var(--duree) * 3.6vh);background:var(--encre);opacity:.08;margin-bottom:18px;transform-origin:bottom}
-.jour.soir .barre-h{background:var(--gencive);opacity:1}
+.jour .barre-h{height:calc(var(--duree) * 3.6vh);background:linear-gradient(180deg,#3E6B6D,#1F4446);margin-bottom:18px;transform-origin:bottom}
+.jour.soir .barre-h{background:linear-gradient(180deg,#F0B3AE,var(--gencive))}
 .jour.ferme .h{color:var(--encre-douce)}
 .jour.ajd .nom::after{content:" · aujourd’hui";color:var(--gencive-fonce)}
 .venez{width:min(86vw,1100px);background:var(--gencive);color:var(--encre);justify-content:space-between!important}
@@ -236,6 +245,21 @@ main{position:relative;z-index:1}
 @media (max-width:760px){.titre-semaine{width:86vw}.jour{width:44vw}}
 
 /* ─── 5. pied ─── */
+.rdv{position:relative;z-index:2;background:var(--encre);color:var(--porcelaine);text-align:center;padding:clamp(90px,16vh,170px) var(--g) clamp(70px,12vh,120px);display:flex;flex-direction:column;align-items:center;gap:clamp(22px,4vh,36px)}
+.rdv-sur{font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,3.4vw,3.2rem);line-height:1.05;letter-spacing:-.02em}
+.rdv-bouton{display:inline-flex;align-items:center;justify-content:center;gap:.6em;min-height:clamp(78px,11vh,112px);padding:0 clamp(34px,5vw,70px);border-radius:999px;
+  font-family:var(--serif);font-size:clamp(1.7rem,4.2vw,3.6rem);letter-spacing:-.02em;line-height:1;color:#2A1414;text-decoration:none;
+  background:linear-gradient(110deg,#E39C9B 0%,#F4C1A6 25%,#E0807F 50%,#F2B3B2 75%,#E39C9B 100%);background-size:300% 100%;
+  box-shadow:0 0 0 0 rgba(227,156,155,.55),0 18px 50px -12px rgba(227,156,155,.55);animation:degrade 6s linear infinite,appel 2.4s ease-out infinite;transition:transform .3s}
+.rdv-bouton svg{width:.8em;height:.8em;transition:transform .3s}
+.rdv-bouton:hover{transform:scale(1.03)}
+.rdv-bouton:hover svg{transform:translateX(.2em)}
+.rdv-bouton:focus-visible{outline:3px solid var(--porcelaine);outline-offset:6px}
+@keyframes degrade{to{background-position:300% 0}}
+@keyframes appel{0%{box-shadow:0 0 0 0 rgba(227,156,155,.55),0 18px 50px -12px rgba(227,156,155,.55)}70%{box-shadow:0 0 0 22px rgba(227,156,155,0),0 18px 50px -12px rgba(227,156,155,.55)}100%{box-shadow:0 0 0 0 rgba(227,156,155,0),0 18px 50px -12px rgba(227,156,155,.55)}}
+.rdv-num{color:var(--brume);font-size:clamp(1rem,1.3vw,1.2rem)}
+.rdv-num b{color:var(--porcelaine);font-weight:500;font-family:var(--large);font-variation-settings:"wdth" 120,"wght" 450;user-select:all}
+@media (max-width:760px){.rdv-bouton{width:100%;font-size:clamp(1.35rem,6.4vw,1.7rem);white-space:nowrap;padding:0 22px}.pied a.grand{white-space:nowrap;font-size:13.5vw}}
 .pied{background:var(--encre);color:var(--brume);padding:clamp(70px,12vh,140px) var(--g) 34px;position:relative;z-index:2}
 .pied a.grand{display:block;font-family:var(--large);font-weight:200;font-variation-settings:"wdth" 150,"wght" 150;font-size:clamp(3.4rem,14vw,15rem);line-height:.85;letter-spacing:-.05em;color:var(--porcelaine);text-decoration:none}
 .pied .ligne-bas{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(50px,9vh,110px);font-size:.85rem}
@@ -277,7 +301,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
 
 <div id="prechargeur" role="dialog" aria-label="Chargement">
   <div class="pre-haut"><span class="pre-marque">Centre Dentaire Langelier</span><span class="compteur">0</span></div>
-  <div class="consigne"><span class="souris" aria-hidden="true"><i></i></span><p id="consigne">Défilez pour avancer</p></div>
+  <div class="consigne"><span class="souris" aria-hidden="true"><i></i></span><svg class="pouce" viewBox="0 0 40 64" aria-hidden="true"><g class="pouce-geste"><path d="M14 30V12a4 4 0 0 1 8 0v14l9 2.4a5 5 0 0 1 3.6 5.8L32 48a8 8 0 0 1-8 6.5h-4.5a8 8 0 0 1-6.4-3.2L7 43.3a3.4 3.4 0 0 1 4.9-4.6L14 41" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g><path class="pouce-fleche" d="M18 9V2m0 0-4 4m4-4 4 4" fill="none" stroke="var(--gencive)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><p id="consigne">Défilez pour avancer</p></div>
   <div><div class="barre"><i></i></div><div class="pre-bas" style="margin-top:14px"><span id="pre-etat">Chargement de la visite</span><span>Saint-Léonard, Montréal</span></div></div>
 </div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -290,7 +314,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
 </svg>
 <canvas id="webgl" aria-hidden="true"></canvas>
 <canvas id="curseur" aria-hidden="true"></canvas>
-<div class="avancer" id="avancer" aria-hidden="true"><span>Défilez pour avancer</span><span class="fleche"></span><span class="progres"><i></i></span></div>
+<div class="avancer" id="avancer" aria-hidden="true"><span class="txt-souris">Défilez pour avancer</span><span class="txt-pouce">Glissez vers le haut</span><span class="fleche"></span><span class="progres"><i></i></span></div>
 
 <header id="entete">
   <a class="marque" href="#">Langelier</a>
@@ -326,7 +350,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
       <div class="etiquette" data-a="email"><i></i><span><b>Émail</b><small>La couche qui vous protège</small></span></div>
       <div class="etiquette" data-a="dentine"><i></i><span><b>Dentine</b><small>Le cœur de la dent</small></span></div>
       <div class="etiquette pulpe" data-a="pulpe"><i></i><span><b>Pulpe et canaux</b><small>Ce qu’on soigne lors d’un canal</small></span></div>
-      <span class="defile" id="defile">Défilez</span>
+      <span class="defile" id="defile"><span class="souris" aria-hidden="true"><i></i></span><svg class="pouce" viewBox="0 0 40 64" aria-hidden="true"><g class="pouce-geste"><path d="M14 30V12a4 4 0 0 1 8 0v14l9 2.4a5 5 0 0 1 3.6 5.8L32 48a8 8 0 0 1-8 6.5h-4.5a8 8 0 0 1-6.4-3.2L7 43.3a3.4 3.4 0 0 1 4.9-4.6L14 41" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g><path class="pouce-fleche" d="M18 9V2m0 0-4 4m4-4 4 4" fill="none" stroke="var(--gencive)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="defile-txt"><span class="txt-souris">Défilez pour avancer</span><span class="txt-pouce">Glissez vers le haut</span></span></span>
       <div class="instrument" id="instrument"><b>Dent 36</b> · première molaire inférieure gauche<br><span id="mesure">Balayage 0 %</span></div>
     </div>
   </section>
@@ -411,6 +435,11 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
   </section>
 
   <!-- 5. pied -->
+  <section class="rdv" id="rendez-vous" aria-label="Prendre rendez-vous">
+    <p class="rdv-sur">Une place pour vous cette semaine</p>
+    <a class="rdv-bouton" href="tel:+15142555511"><span>Prendre rendez-vous</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <p class="rdv-num">Par téléphone : <b>514 255-5511</b> · lundi au samedi, jusqu’à 21&nbsp;h jeudi et vendredi</p>
+  </section>
   <footer class="pied">
     <a class="grand" href="tel:+15142555511">514 255-5511</a>
     <div class="ligne-bas"><span>Centre Dentaire Langelier, 7335, boulevard Langelier, Saint-Léonard</span><span>Photos d’illustration : Unsplash (Atikah Akhtar, Caroline LM, Jonathan Borba, Angels for Humanity, Quang Tri Nguyen, Benyamin Bohlouli, Katarzyna Zygnerska, Vitaly Gariev). Maquette proposée par Spiralia</span></div>
@@ -514,7 +543,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
         gsap.fromTo(imgs[i],{clipPath:(sens>0?"inset(100% 0% 0% 0%)":"inset(0% 0% 100% 0%)")},{clipPath:"inset(0% 0% 0% 0%)",duration:.9,ease:"power3.inOut"});
       }
     }
-    const longueur=()=>innerHeight*.85*n;
+    const longueur=()=>innerHeight*.5*n;
     const st=ScrollTrigger.create({trigger:sec,start:"top top",end:()=>"+="+longueur(),pin:true,anticipatePin:1,invalidateOnRefresh:true,
       onUpdate:x=>{
         etat.p=x.progress*(n-1); etat.vel=Math.max(-1,Math.min(1,x.getVelocity()/2600));
@@ -583,7 +612,7 @@ const compteur = pre.querySelector(".compteur"), barre = pre.querySelector(".bar
 
 let lenis = null;
 if (gsap && window.Lenis && !reduit) {
-  lenis = new Lenis({duration:1.2, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))}); window.lenisSite = lenis;
+  lenis = new Lenis({duration:.9, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))}); window.lenisSite = lenis;
   lenis.on("scroll", ScrollTrigger.update);
   gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
   document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{
@@ -886,14 +915,14 @@ if (gsap) {
   const sortie = id=>[[lignes(id),{yPercent:-135,stagger:.03,duration:.5}],[suites(id),{opacity:0,y:-20,duration:.4}]];
   gsap.set("#ch1 .l, #ch2 .l",{fontVariationSettings:'"wght" 900, "opsz" 96'});
   const entree = id=>[[lignes(id),{yPercent:0,stagger:.05,duration:.6}],[document.querySelectorAll(`#${id} .l`),{fontVariationSettings:'"wght" 400, "opsz" 96',stagger:{each:.012,from:"start"},duration:.35,ease:"power1.out"}],[suites(id),{opacity:1,y:0,duration:.5}]];
-  const tl = gsap.timeline({defaults:{ease:"power2.inOut"}, scrollTrigger:{trigger:"#recit",start:"top top",end:"bottom bottom",scrub:1.1}});
+  const tl = gsap.timeline({defaults:{ease:"power2.inOut"}, scrollTrigger:{trigger:"#recit",start:"top top",end:"bottom bottom",scrub:.5}});
   // 0 : le sourire s'ouvre, les lèvres de texte se redressent, la 36 s'avance
-  tl.addLabel("c0", .35);
+  tl.addLabel("c0", 0);
   // on plonge dans le sourire : la photo s'agrandit vers les dents de droite et se dissout
-  tl.to("#bouche",{scale:m?2.2:2.8, opacity:0, filter:"blur(14px)", transformOrigin:m?"60% 52%":"64% 54%", duration:1.4, ease:"power2.in"},"c0")
-    .to(S,{ech:m?.55:1, tx:m?0:1.25, ty:m?.75:0, rotY:-.5, rotX:.25, spin:1, duration:1.5, ease:"power3.inOut"},"c0+=.15");
-  tl.to(etatLevres,{p:1,duration:1.1,ease:"power3.inOut",onUpdate:dessinerLevres},"c0");
-  tl.addLabel("c1", "c0+=2.6");
+  tl.to("#bouche",{scale:m?2.2:2.8, opacity:0, filter:"blur(14px)", transformOrigin:m?"60% 52%":"64% 54%", duration:1.4, ease:"power1.out"},"c0")
+    .to(S,{ech:m?.55:1, tx:m?0:1.25, ty:m?.75:0, rotY:-.5, rotX:.25, spin:1, duration:1.5, ease:"power2.out"},"c0+=.1");
+  tl.to(etatLevres,{p:1,duration:1.1,ease:"power2.out",onUpdate:dessinerLevres},"c0");
+  tl.addLabel("c1", "c0+=1.7");
   sortie("ch0").forEach(([t,v])=>tl.to(t,v,"c1"));
   tl.to("#levres",{opacity:0,y:-60,duration:.6},"c1");
   tl.to("#defile",{opacity:0,duration:.3},"c1")
@@ -901,7 +930,7 @@ if (gsap) {
   entree("ch1").forEach(([t,v])=>tl.to(t,v,"c1+=.7"));
   // le scanner descend sur la dent pendant « Ce qu'on voit, on vous l'explique »
   tl.fromTo(S,{scan:1.6},{scan:-1.7, duration:1.3, ease:"none"},"c1+=.5");
-  tl.addLabel("c2", "c1+=2.2");
+  tl.addLabel("c2", "c1+=1.9");
   sortie("ch1").forEach(([t,v])=>tl.to(t,v,"c2"));
   tl.to(S,{scan:1.6, duration:.7, ease:"power1.inOut"},"c2");
   tl.to(S,{orb:m?0:.25, tx:m?0:1.2, ty:m?-.62:-.1, rotY:Math.PI*2, rotX:.12, spin:0, rayon:m?6.8:5.9, haut:.35, ech:m?.6:1, duration:1},"c2")
@@ -909,7 +938,7 @@ if (gsap) {
     .to(S,{coupeD:.12, duration:.8},"c2+=.95")
     .to(S,{etiq:1, duration:.5},"c2+=1.3");
   entree("ch2").forEach(([t,v])=>tl.to(t,v,"c2+=.5"));
-  tl.to({}, {duration:2.6});
+  tl.to({}, {duration:.8});
   // les soins glissent par-dessus : la scène recule, puis on arrête de la calculer
   gsap.timeline({scrollTrigger:{trigger:"#soins",start:"top bottom",end:"top top",scrub:1}}).to(S,{rayon:11, ech:.7, etiq:0});
   ScrollTrigger.create({trigger:"#soins",start:"top top",onEnter:()=>visible=false,onLeaveBack:()=>{visible=true;boucle();}});
@@ -942,7 +971,7 @@ function boucle(){
   requestAnimationFrame(function f(){
     if (!visible || document.hidden){ enCours = false; return; }
     const dt = Math.min(horloge.getDelta(),.1), t = horloge.elapsedTime;
-    const k = 1-Math.pow(1-.08, dt*60);
+    const k = 1-Math.pow(1-.14, dt*60);
     for (const c in S) L[c] += (S[c]-L[c])*k;
     souris.lx += (souris.x-souris.lx)*.08; souris.ly += (souris.y-souris.ly)*.08;
     if (!reduit) spinAcc += dt*.12*L.spin;
@@ -992,15 +1021,11 @@ let lance = false, entre = false;
 const tactile = matchMedia("(pointer: coarse)").matches;
 const consigne = document.getElementById("consigne"), preEtat = document.getElementById("pre-etat");
 const ecrireConsigne = txt=>{ consigne.innerHTML=txt.split(" ").map(m=>'<span class="mot">'+[...m].map(c=>'<span class="l">'+c+'</span>').join("")+'</span>').join(" "); return consigne.querySelectorAll(".l"); };
-ecrireConsigne(tactile ? "Glissez vers le haut pour avancer" : "Défilez pour avancer");
-if (lenis) lenis.stop();
-document.documentElement.style.overflow="hidden";
+ecrireConsigne(tactile ? "Glissez vers le haut avec le pouce" : "Défilez pour avancer");
 manager.onProgress = (u,l,tot)=>{ const p=Math.round(l/tot*100); compteur.textContent=p; barre.style.width=p+"%"; };
 function entrer(){
   if (entre) return; entre = true;
   pre.classList.add("fini");
-  document.documentElement.style.overflow="";
-  if (lenis) lenis.start();
   ScrollTrigger && ScrollTrigger.refresh();
   if (reduit || !gsap) return;
   L.rayon = 13;
@@ -1015,9 +1040,10 @@ function entreeScene(){
   gsap.to(o,{v:100,duration:.9,ease:"power2.inOut",onUpdate:()=>{compteur.textContent=Math.round(o.v);barre.style.width=o.v+"%";},onComplete:()=>{
     pre.classList.add("pret");
     preEtat.textContent = "Prêt";
-    const ls = ecrireConsigne(tactile ? "Glissez pour entrer" : "Défilez pour entrer");
+    const ls = ecrireConsigne(tactile ? "Glissez vers le haut pour entrer" : "Défilez pour entrer");
     gsap.fromTo(ls,{fontVariationSettings:'"wght" 900, "opsz" 96',opacity:.2},{fontVariationSettings:'"wght" 400, "opsz" 96',opacity:1,stagger:.025,duration:.6,ease:"power2.out"});
-    ["wheel","touchmove","keydown","click"].forEach(ev=>addEventListener(ev,entrer,{once:true,passive:true}));
+    ["wheel","touchstart","keydown","click"].forEach(ev=>addEventListener(ev,entrer,{once:true,passive:true}));
+    setTimeout(entrer, 1400);
   }});
 }
 const attente = setInterval(()=>{ if(dent){ clearInterval(attente); entreeScene(); } }, 60);
