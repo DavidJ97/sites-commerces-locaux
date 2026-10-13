@@ -13,7 +13,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <title>Centre Dentaire Langelier</title>
-<meta name="description" content="Clinique dentaire familiale au 7335, boulevard Langelier, Saint-Léonard. Ouvert le soir jeudi et vendredi.">
+<meta name="description" content="Clinique dentaire familiale à Saint-Léonard : examens, traitements de canal, soins pour enfants, urgences. Ouvert jusqu’à 21 h jeudi et vendredi. 514 255-5511.">
+<meta name="theme-color" content="#0B2224">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_CA">
+<meta property="og:title" content="Centre Dentaire Langelier, Saint-Léonard">
+<meta property="og:description" content="Trois générations de sourires. Examens, canaux, enfants, urgences. Ouvert le soir jeudi et vendredi.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B2224'/%3E%3Cpath d='M9 8c3-2 5 0 7 0s4-2 7 0c2 2 1 7-1 10-1 3-1 7-3 7s-2-6-3-6-1 6-3 6-2-4-3-7C8 15 7 10 9 8z' fill='%23EDF0EE'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Dentist","name":"Centre Dentaire Langelier","telephone":"+1-514-255-5511",
+ "address":{"@type":"PostalAddress","streetAddress":"7335, boulevard Langelier","addressLocality":"Saint-Léonard","addressRegion":"QC","postalCode":"H1S 1V7","addressCountry":"CA"},
+ "geo":{"@type":"GeoCoordinates","latitude":45.5915546,"longitude":-73.5696851},
+ "openingHoursSpecification":[
+  {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Saturday"],"opens":"10:00","closes":"17:00"},
+  {"@type":"OpeningHoursSpecification","dayOfWeek":["Thursday","Friday"],"opens":"10:00","closes":"21:00"}],
+ "aggregateRating":{"@type":"AggregateRating","ratingValue":"4.9","reviewCount":"167"},
+ "availableLanguage":["fr","en"]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Anybody:wdth,wght@50..150,100..900&display=swap" rel="stylesheet">
@@ -67,7 +83,8 @@ nav a{text-decoration:none;position:relative}
 nav a::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s cubic-bezier(.7,0,.2,1)}
 nav a:hover::after{transform:scaleX(1);transform-origin:left}
 header.cache{transform:translateY(-110%)}
-@media (max-width:760px){nav a.lien{display:none}}
+.tel-court{display:none}
+@media (max-width:760px){nav a.lien{display:none}.tel-long{display:none}.tel-court{display:inline}}
 
 main{position:relative;z-index:1}
 
@@ -165,7 +182,7 @@ main{position:relative;z-index:1}
 .cs-liste{list-style:none;counter-reset:soin}
 .cs-liste li{counter-increment:soin;border-top:1px solid var(--trait)}
 .cs-liste li:last-child{border-bottom:1px solid var(--trait)}
-.cs-liste button{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:14px;width:100%;padding:9px 0;font-family:var(--serif);font-size:clamp(1.15rem,1.7vw,1.7rem);line-height:1.1;letter-spacing:-.01em;color:var(--encre);opacity:.35;transition:opacity .4s}
+.cs-liste button{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:14px;width:100%;padding:11px 0;min-height:24px;font-family:var(--serif);font-size:clamp(1.15rem,1.7vw,1.7rem);line-height:1.1;letter-spacing:-.01em;color:var(--encre);opacity:.55;transition:opacity .4s}
 .cs-liste button::before{content:counter(soin,decimal-leading-zero);font-family:var(--large);font-variation-settings:"wdth" 120,"wght" 350;font-size:.6em;color:var(--encre-douce)}
 .cs-liste button:hover{opacity:.7}
 .cs-liste button:focus-visible{outline:2px solid var(--gencive-fonce);outline-offset:3px}
@@ -260,9 +277,19 @@ main{position:relative;z-index:1}
 @keyframes appel{0%{box-shadow:0 0 0 0 rgba(227,156,155,.55),0 18px 50px -12px rgba(227,156,155,.55)}70%{box-shadow:0 0 0 22px rgba(227,156,155,0),0 18px 50px -12px rgba(227,156,155,.55)}100%{box-shadow:0 0 0 0 rgba(227,156,155,0),0 18px 50px -12px rgba(227,156,155,.55)}}
 .rdv-num{color:var(--brume);font-size:clamp(1rem,1.3vw,1.2rem)}
 .rdv-num b{color:var(--porcelaine);font-weight:500;font-family:var(--large);font-variation-settings:"wdth" 120,"wght" 450;user-select:all}
-@media (max-width:760px){.rdv-bouton{width:100%;font-size:clamp(1.35rem,6.4vw,1.7rem);white-space:nowrap;padding:0 22px}.pied a.grand{white-space:nowrap;font-size:13.5vw}}
+@media (max-width:760px){.rdv-bouton{width:100%;font-size:clamp(1.35rem,6.4vw,1.7rem);white-space:nowrap;padding:0 22px}.pied a.grand{white-space:nowrap;font-size:10.4vw}}
+.evitement{position:fixed;left:16px;top:-80px;z-index:60;background:var(--porcelaine);color:var(--encre);padding:12px 18px;border-radius:8px;font-weight:600}
+.evitement:focus{top:16px}
+.rdv-flottant{position:fixed;right:var(--g);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:35;display:inline-flex;align-items:center;min-height:56px;padding:0 26px;border-radius:999px;
+  font-family:var(--serif);font-size:1.25rem;color:#2A1414;text-decoration:none;white-space:nowrap;
+  background:linear-gradient(110deg,#E39C9B 0%,#F4C1A6 25%,#E0807F 50%,#F2B3B2 75%,#E39C9B 100%);background-size:300% 100%;animation:degrade 6s linear infinite;
+  box-shadow:0 12px 30px -10px rgba(0,0,0,.45);transform:translateY(140%);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.rdv-flottant.vu{transform:none}
+.rdv-flottant:focus-visible{outline:3px solid var(--porcelaine);outline-offset:4px}
+@media (max-width:760px){.rdv-flottant{left:16px;right:16px;justify-content:center;font-size:1.2rem}}
+body.indicateur .rdv-flottant{transform:translateY(140%)}
 .pied{background:var(--encre);color:var(--brume);padding:clamp(70px,12vh,140px) var(--g) 34px;position:relative;z-index:2}
-.pied a.grand{display:block;font-family:var(--large);font-weight:200;font-variation-settings:"wdth" 150,"wght" 150;font-size:clamp(3.4rem,14vw,15rem);line-height:.85;letter-spacing:-.05em;color:var(--porcelaine);text-decoration:none}
+.pied a.grand{display:block;font-family:var(--large);font-weight:200;font-variation-settings:"wdth" 150,"wght" 150;white-space:nowrap;font-size:clamp(2.6rem,9.6vw,12rem);line-height:.85;letter-spacing:-.05em;color:var(--porcelaine);text-decoration:none}
 .pied .ligne-bas{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(50px,9vh,110px);font-size:.85rem}
 .avancer{position:fixed;left:50%;bottom:clamp(18px,3.5vh,34px);z-index:30;transform:translate(-50%,16px);opacity:0;pointer-events:none;
   display:flex;align-items:center;gap:14px;padding:11px 18px 11px 20px;border-radius:999px;background:var(--encre);color:var(--porcelaine);font-size:.88rem;transition:opacity .35s,transform .35s}
@@ -317,13 +344,14 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
 <canvas id="curseur" aria-hidden="true"></canvas>
 <div class="avancer" id="avancer" aria-hidden="true"><span class="txt-souris">Défilez pour avancer</span><span class="txt-pouce">Glissez vers le haut</span><span class="fleche"></span><span class="progres"><i></i></span></div>
 
+<a class="evitement" href="#soins">Aller aux soins</a>
 <header id="entete">
   <a class="marque" href="#">Langelier</a>
   <nav aria-label="Navigation principale">
     <a class="lien" href="#soins">Soins</a>
     <a class="lien" href="#avis">Avis</a>
     <a class="lien" href="#semaine">Horaires</a>
-    <a href="tel:+15142555511">514 255-5511</a>
+    <a href="tel:+15142555511"><span class="tel-long">514 255-5511</span><span class="tel-court">Appeler</span></a>
   </nav>
 </header>
 
@@ -382,7 +410,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
         <div class="cs-pied">
           <div class="cs-textes">
           <div class="cs-texte" data-i="0"><p>Le suivi régulier qui évite les mauvaises surprises. On vous montre ce qu’on voit et on vous l’explique.</p><div class="pour"><span>Pour</span><b>Toute la famille</b></div></div>
-          <div class="cs-texte" data-i="1"><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p><div class="pour"><span>Ce qu’on en dit</span><b>« Je n’ai presque rien senti »</b></div></div>
+          <div class="cs-texte" data-i="1"><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p><div class="pour"><span>Un patient sur Google</span><b>« À peine ressenti d’inconfort »</b></div></div>
           <div class="cs-texte" data-i="2"><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p><div class="pour"><span>Pour</span><b>Dès la première dent</b></div></div>
           <div class="cs-texte" data-i="3"><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p><div class="pour"><span>Avant le soin</span><b>Prix annoncé</b></div></div>
           <div class="cs-texte" data-i="4"><p>Une dent cassée, une douleur soudaine : appelez au <a href="tel:+15142555511">514 255-5511</a>, on trouve une place rapidement.</p><div class="pour"><span>Même jour</span><b>Dans la mesure du possible</b></div></div>
@@ -437,15 +465,16 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
 
   <!-- 5. pied -->
   <section class="rdv" id="rendez-vous" aria-label="Prendre rendez-vous">
-    <p class="rdv-sur">Une place pour vous cette semaine</p>
+    <p class="rdv-sur">On vous attend au 7335, boulevard Langelier</p>
     <a class="rdv-bouton" href="tel:+15142555511"><span>Prendre rendez-vous</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <p class="rdv-num">Par téléphone : <b>514 255-5511</b> · lundi au samedi, jusqu’à 21&nbsp;h jeudi et vendredi</p>
   </section>
   <footer class="pied">
     <a class="grand" href="tel:+15142555511">514 255-5511</a>
-    <div class="ligne-bas"><span>Centre Dentaire Langelier, 7335, boulevard Langelier, Saint-Léonard</span><span>Photos d’illustration : Unsplash (Atikah Akhtar, Caroline LM, Jonathan Borba, Angels for Humanity, Quang Tri Nguyen, Benyamin Bohlouli, Katarzyna Zygnerska, Vitaly Gariev). Maquette proposée par Spiralia</span></div>
+    <div class="ligne-bas"><span>© 2026 Centre Dentaire Langelier · 7335, boulevard Langelier, Saint-Léonard (Québec) H1S 1V7 · 514 255-5511</span><span>Photos d’illustration : Unsplash (Caroline LM, Jonathan Borba, Angels for Humanity, Quang Tri Nguyen, Benyamin Bohlouli, Vitaly Gariev). Site conçu par Spiralia</span></div>
   </footer>
 </main>
+<a class="rdv-flottant" id="rdv-flottant" href="#rendez-vous"><span>Prendre rendez-vous</span></a>
 
 <script>
 (function(){
@@ -556,6 +585,15 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
     activer(0);
     btns.forEach((b,i)=>b.addEventListener("click",()=>{ const y=st.start+i/(n-1)*(st.end-st.start); window.lenisSite ? window.lenisSite.scrollTo(y) : scrollTo({top:y,behavior:"smooth"}); }));
   })();
+  (function(){
+    const b=document.getElementById("rdv-flottant"); if(!b) return;
+    let apresAccueil=false, surRdv=false;
+    const maj=()=>b.classList.toggle("vu", apresAccueil && !surRdv);
+    ScrollTrigger.create({trigger:"#soins",start:"top 80%",end:"max",onToggle:x=>{apresAccueil=x.isActive;maj();}});
+    ScrollTrigger.create({trigger:"#rendez-vous",start:"top bottom",end:"max",onToggle:x=>{surRdv=x.isActive;maj();}});
+    const ind=document.getElementById("avancer");
+    new MutationObserver(()=>document.body.classList.toggle("indicateur",ind.classList.contains("actif"))).observe(ind,{attributes:true,attributeFilter:["class"]});
+  })();
   document.querySelectorAll(".horiz").forEach(sec=>{
     const piste=sec.querySelector(".piste");
     const dist=()=>Math.max(0,piste.scrollWidth-innerWidth);
@@ -597,7 +635,6 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
 <script type="module">
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MarchingCubes } from "three/addons/objects/MarchingCubes.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -627,7 +664,7 @@ try { renderer = new THREE.WebGLRenderer({canvas, antialias:false, powerPreferen
 catch(e){ canvas.remove(); pre.classList.add("fini"); }
 
 if (renderer) {
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth<760 ? 1.5 : 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -808,15 +845,11 @@ sourire.updateMatrixWorld(true);
 dent36.getWorldPosition(pos36);
 let dent = null;
 const manager = new THREE.LoadingManager();
-new GLTFLoader(manager).load("dent.glb",
-  (g)=>{ const o=g.scene, box=new THREE.Box3().setFromObject(o), s=box.getSize(new THREE.Vector3()), c=box.getCenter(new THREE.Vector3());
-    o.position.sub(c); o.traverse(m=>{ if(m.isMesh) m.material = email; });
-    const w = new THREE.Group(); w.add(o); w.scale.setScalar(1.7/Math.max(s.x,s.y,s.z)); dent = w; stage.add(w); },
-  undefined, ()=>{ if(!dent){ dent = dentIntegree(); stage.add(dent); } });
+dent = dentIntegree(); stage.add(dent);
 
 /* post-traitement */
 const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, {type:THREE.HalfFloatType}));
-composer.setPixelRatio(Math.min(devicePixelRatio,2)); composer.setSize(innerWidth, innerHeight);
+composer.setPixelRatio(Math.min(devicePixelRatio, innerWidth<760 ? 1.5 : 2)); composer.setSize(innerWidth, innerHeight);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 0.4, 0.55, 0.82); composer.addPass(bloom);
 composer.addPass(new ShaderPass({
@@ -860,7 +893,7 @@ function construireLevres(){
   // arc au-dessus de la lèvre du haut (forme de l'arc de Cupidon élargi)
   const hautG=P(xa, mob?.2:.26), hautD=P(xb, mob?.2:.26), hautM=P(.5,.095);
   // creux sous la lèvre du bas
-  const basG=P(xa+.04, mob?.66:.58), basD=P(xb-.04, mob?.68:.6), basM=P(.5,.8);
+  const basG=P(xa+.04, mob?.72:.58), basD=P(xb-.04, mob?.74:.6), basM=P(.5, mob?.86:.8);
   const lignes = mob
     ? [{t:"Trois générations",arc:[hautG,hautM,hautD],sous:0},{t:"de sourires",arc:[basG,basM,basD],sous:1,ital:1,fs:W*.085},{t:"à Saint\u2011Léonard.",arc:[basG,basM,basD],sous:2,ital:1,fs:W*.085}]
     : [{t:"Trois générations de sourires",arc:[hautG,hautM,hautD],sous:0},{t:"à Saint\u2011Léonard.",arc:[basG,basM,basD],sous:1,ital:1}];
@@ -1060,7 +1093,7 @@ import * as THREE from "three";
   const cadre=sec.querySelector(".cs-cadre");
   const canvas=document.createElement("canvas"); canvas.className="cs-gl"; canvas.setAttribute("aria-hidden","true"); sec.prepend(canvas);
   let r; try{ r=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true}); }catch(e){ canvas.remove(); return; }
-  r.setPixelRatio(Math.min(devicePixelRatio,2)); r.outputColorSpace=THREE.SRGBColorSpace;
+  r.setPixelRatio(Math.min(devicePixelRatio, innerWidth<760 ? 1.5 : 2)); r.outputColorSpace=THREE.SRGBColorSpace;
   const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(30,1,1,20000);
 
   // textures : photos des soins + panneau d'urgence dessiné
