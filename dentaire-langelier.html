@@ -99,7 +99,14 @@ main{position:relative;z-index:1}
 .ouverture{width:min(78vw,1100px)}
 .ouverture h2{font-family:var(--serif);font-weight:300;font-size:clamp(3.2rem,9vw,9.6rem);line-height:.88;letter-spacing:-.04em;max-width:8ch}
 .ouverture p{max-width:36ch;font-size:clamp(1rem,1.3vw,1.2rem);color:var(--encre-douce)}
-.soin{width:clamp(300px,34vw,560px);border-left:1px solid var(--trait)}
+.soin{width:clamp(300px,34vw,560px);border-left:1px solid var(--trait);gap:clamp(18px,3vh,32px)}
+.photo{position:relative;overflow:hidden;flex:1;min-height:0;background:#d9dfdc}
+.photo img{position:absolute;inset:-6% -8%;width:116%;height:112%;object-fit:cover;filter:saturate(.78) contrast(1.03);will-change:transform}
+.photo figcaption{position:absolute;left:12px;bottom:10px;font-size:.72rem;color:rgba(255,255,255,.85);text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.ouverture{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:clamp(24px,4vw,70px)}
+.ouverture .texte{display:flex;flex-direction:column;justify-content:space-between}
+.salle{width:clamp(320px,42vw,700px);padding:0!important}
+.salle .photo{height:100%}
 .soin h3{font-family:var(--serif);font-weight:300;font-size:clamp(2.2rem,3.6vw,3.8rem);line-height:.95;letter-spacing:-.03em}
 .soin p{max-width:30ch;color:var(--encre-douce);font-size:clamp(1rem,1.15vw,1.1rem)}
 .soin .pour{font-size:.85rem;color:var(--encre-douce);display:flex;justify-content:space-between;gap:16px;padding-top:14px;border-top:1px solid var(--trait);margin-top:28px}
@@ -109,10 +116,12 @@ main{position:relative;z-index:1}
 .soin.urgence .pour{border-color:rgba(237,240,238,.2)}
 .soin.urgence .pour b{color:var(--gencive)}
 .soin.urgence a{font-family:var(--serif);font-size:clamp(1.8rem,2.6vw,2.6rem);text-decoration:none;border-bottom:1px solid var(--gencive);align-self:flex-start}
-@media (max-width:760px){.ouverture{width:88vw}.soin{width:82vw}}
+@media (max-width:760px){.ouverture{width:88vw;grid-template-columns:1fr;grid-template-rows:auto 1fr}.ouverture .texte{gap:18px}.soin{width:82vw}.salle{width:80vw}}
 
 /* ─── 3. vertical : la phrase qui se remplit ─── */
-.temoin{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:clamp(90px,14vh,160px) var(--g)}
+.temoin{min-height:100vh;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(28px,5vw,90px);align-items:center;padding:clamp(90px,14vh,160px) var(--g)}
+.temoin .photo{height:min(78vh,760px);flex:none}
+@media (max-width:760px){.temoin{grid-template-columns:1fr}.temoin .photo{height:62vh;order:-1}}
 .temoin blockquote{font-family:var(--serif);font-weight:300;font-size:clamp(2.2rem,5.4vw,5.8rem);line-height:1;letter-spacing:-.03em;max-width:16ch}
 .temoin blockquote .mot{color:rgba(19,32,28,.14);transition:none}
 .temoin footer{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-top:clamp(36px,7vh,80px);font-size:1rem;color:var(--encre-douce)}
@@ -146,6 +155,17 @@ main{position:relative;z-index:1}
 .pied{background:var(--encre);color:var(--brume);padding:clamp(70px,12vh,140px) var(--g) 34px;position:relative;z-index:2}
 .pied a.grand{display:block;font-family:var(--serif);font-weight:300;font-size:clamp(3.2rem,12vw,13rem);line-height:.85;letter-spacing:-.05em;color:var(--porcelaine);text-decoration:none}
 .pied .ligne-bas{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(50px,9vh,110px);font-size:.85rem}
+.avancer{position:fixed;left:50%;bottom:clamp(18px,3.5vh,34px);z-index:30;transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:14px;padding:11px 18px 11px 20px;border-radius:999px;background:var(--encre);color:var(--porcelaine);font-size:.88rem;transition:opacity .35s,transform .35s}
+.avancer.actif{opacity:1;transform:translate(-50%,0)}
+.avancer span{white-space:nowrap}
+.horiz .panneau:not(.salle){padding-bottom:clamp(88px,12vh,116px)}
+@media (max-width:760px){.ouverture .photo{min-height:40vh}}
+.avancer .fleche{position:relative;width:34px;height:1px;background:rgba(237,240,238,.35);overflow:hidden}
+.avancer .fleche::after{content:"";position:absolute;inset:0;background:var(--gencive);animation:pousse 1.6s ease-in-out infinite}
+@keyframes pousse{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.avancer .progres{width:clamp(60px,9vw,120px);height:2px;background:rgba(237,240,238,.18);border-radius:2px;overflow:hidden}
+.avancer .progres i{display:block;height:100%;width:100%;background:var(--porcelaine);transform-origin:left;transform:scaleX(0)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
@@ -153,6 +173,7 @@ main{position:relative;z-index:1}
 
 <div id="prechargeur" aria-hidden="true"><div class="compteur">0</div><div class="barre"><i></i></div></div>
 <canvas id="webgl" aria-hidden="true"></canvas>
+<div class="avancer" id="avancer" aria-hidden="true"><span>Défilez pour avancer</span><span class="fleche"></span><span class="progres"><i></i></span></div>
 
 <header>
   <a class="marque" href="#">Langelier</a>
@@ -194,23 +215,30 @@ main{position:relative;z-index:1}
   <section class="clair horiz" id="soins" aria-label="Nos soins">
     <div class="piste">
       <div class="panneau ouverture">
-        <h2>Ce qu’on fait pour vous</h2>
-        <p>Du premier rendez-vous de votre enfant au traitement plus complexe, tout se fait ici, avec la même équipe.</p>
+        <div class="texte">
+          <h2>Ce qu’on fait pour vous</h2>
+          <p>Du premier rendez-vous de votre enfant au traitement plus complexe, tout se fait ici, avec la même équipe.</p>
+        </div>
+        <figure class="photo"><img src="https://images.unsplash.com/photo-1728342057953-94bfad8f0e7e?auto=format&fit=crop&w=1400&q=75" alt="Fauteuil dentaire blanc près d’une fenêtre"></figure>
       </div>
       <article class="panneau soin">
         <h3>Examens et nettoyage</h3>
+        <figure class="photo"><img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1000&q=75" alt="Examen dentaire au miroir" loading="lazy"></figure>
         <div><p>Le suivi régulier qui évite les mauvaises surprises. On vous explique ce qu’on voit.</p><div class="pour"><span>Pour</span><b>Toute la famille</b></div></div>
       </article>
       <article class="panneau soin">
         <h3>Traitements de canal</h3>
+        <figure class="photo"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1000&q=75" alt="Dentiste qui lit des radiographies sur un négatoscope" loading="lazy"></figure>
         <div><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p><div class="pour"><span>Ce qu’on en dit</span><b>« Je n’ai presque rien senti »</b></div></div>
       </article>
       <article class="panneau soin">
         <h3>Soins pour enfants</h3>
+        <figure class="photo"><img src="https://images.unsplash.com/photo-1758205307836-0829c799890b?auto=format&fit=crop&w=1000&q=75" alt="Dentiste qui examine les dents d’un jeune garçon" loading="lazy"></figure>
         <div><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p><div class="pour"><span>Pour</span><b>Dès la première dent</b></div></div>
       </article>
       <article class="panneau soin">
         <h3>Prix et assurances</h3>
+        <figure class="photo"><img src="https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?auto=format&fit=crop&w=1000&q=75" alt="Explication d’une image dentaire sur une tablette" loading="lazy"></figure>
         <div><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p><div class="pour"><span>Avant le soin</span><b>Prix annoncé</b></div></div>
       </article>
       <article class="panneau soin urgence">
@@ -222,6 +250,7 @@ main{position:relative;z-index:1}
 
   <!-- 3. vertical, la phrase qui se remplit -->
   <section class="clair temoin" id="avis" aria-label="Avis">
+    <div class="cote-texte">
     <blockquote id="phrase">Des parents, leurs enfants et maintenant leurs petits-enfants, soignés par la même clinique.</blockquote>
     <footer>
       <span>Un patient depuis plus de 20 ans, sur Google</span>
@@ -231,6 +260,8 @@ main{position:relative;z-index:1}
       <p>Une main légère, même pendant un traitement de canal.<small>Ce qui revient dans les avis sur le Dr Luu</small></p>
       <p>Une réception qui démêle les assurances et annonce le prix avant de commencer.<small>Ce qui revient dans plusieurs avis</small></p>
     </div>
+    </div>
+    <figure class="photo"><img src="https://images.unsplash.com/photo-1758874960855-3f74e8704a1d?auto=format&fit=crop&w=1200&q=75" alt="Trois femmes de trois générations qui sourient" loading="lazy"></figure>
   </section>
 
   <!-- 4. horizontal, la semaine -->
@@ -247,6 +278,7 @@ main{position:relative;z-index:1}
       <div class="panneau jour soir" data-j="5" style="--duree:11"><div class="barre-h"></div><span class="nom">Vendredi</span><span class="h">10–21&nbsp;h</span></div>
       <div class="panneau jour" data-j="6" style="--duree:7"><div class="barre-h"></div><span class="nom">Samedi</span><span class="h">10–17&nbsp;h</span></div>
       <div class="panneau jour ferme" data-j="0" style="--duree:0"><div class="barre-h"></div><span class="nom">Dimanche</span><span class="h">Fermé</span></div>
+      <div class="panneau salle"><figure class="photo"><img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=1400&q=75" alt="Cabinet dentaire moderne" loading="lazy"><figcaption>Photo d’illustration</figcaption></figure></div>
       <div class="panneau venez" id="visite">
         <h2>Venez nous voir</h2>
         <div class="bas">
@@ -260,7 +292,7 @@ main{position:relative;z-index:1}
   <!-- 5. pied -->
   <footer class="pied">
     <a class="grand" href="tel:+15142555511">514 255-5511</a>
-    <div class="ligne-bas"><span>Centre Dentaire Langelier, 7335, boulevard Langelier, Saint-Léonard</span><span>Maquette proposée par Spiralia</span></div>
+    <div class="ligne-bas"><span>Centre Dentaire Langelier, 7335, boulevard Langelier, Saint-Léonard</span><span>Photos d’illustration : Unsplash (Atikah Akhtar, Caroline LM, Jonathan Borba, Angels for Humanity, Quang Tri Nguyen, Benyamin Bohlouli, Katarzyna Zygnerska, Vitaly Gariev). Maquette proposée par Spiralia</span></div>
   </footer>
 </main>
 
@@ -297,10 +329,25 @@ main{position:relative;z-index:1}
     sec.querySelectorAll(".barre-h").forEach(b=>{
       gsap.from(b,{scaleY:0,ease:"power3.out",duration:1,scrollTrigger:{trigger:b.closest(".jour"),containerAnimation:tw,start:"left 85%"}});
     });
+    // photos : rideau qui s'ouvre puis léger glissement de l'image dans son cadre
+    sec.querySelectorAll(".photo").forEach(ph=>{
+      const img=ph.querySelector("img");
+      gsap.fromTo(ph,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",ease:"power3.inOut",duration:1.2,
+        scrollTrigger:{trigger:ph,containerAnimation:tw,start:"left 92%"}});
+      gsap.fromTo(img,{xPercent:6},{xPercent:-6,ease:"none",scrollTrigger:{trigger:ph,containerAnimation:tw,start:"left right",end:"right left",scrub:true}});
+    });
+    // indicateur « Défilez pour avancer » tant que la piste est épinglée
+    const ind=document.getElementById("avancer"), barre=ind.querySelector(".progres i");
+    ScrollTrigger.create({trigger:sec,start:"top top",end:()=>"+="+dist(),
+      onToggle:st=>ind.classList.toggle("actif",st.isActive && st.progress<.97),
+      onUpdate:st=>{ barre.style.transform="scaleX("+st.progress+")"; ind.classList.toggle("actif",st.progress<.97); }});
     sec.querySelectorAll(".soin h3, .jour .h").forEach(t=>{
       gsap.from(t,{yPercent:30,opacity:0,ease:"power3.out",duration:1,scrollTrigger:{trigger:t.closest(".panneau"),containerAnimation:tw,start:"left 80%"}});
     });
   });
+  const phAvis=document.querySelector("#avis .photo");
+  gsap.fromTo(phAvis,{clipPath:"inset(0% 0% 100% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",ease:"power3.inOut",duration:1.3,scrollTrigger:{trigger:phAvis,start:"top 80%"}});
+  gsap.fromTo(phAvis.querySelector("img"),{yPercent:-5},{yPercent:5,ease:"none",scrollTrigger:{trigger:phAvis,start:"top bottom",end:"bottom top",scrub:true}});
   gsap.to("#phrase .mot",{color:"#13201C",stagger:.1,ease:"none",scrollTrigger:{trigger:"#avis",start:"top 70%",end:"center 45%",scrub:1}});
 })();
 </script>
