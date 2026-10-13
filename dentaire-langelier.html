@@ -1,9 +1,11 @@
 <!doctype html>
 <!--
   Centre Dentaire Langelier — maquette Spiralia
-  Base : awwwards-3d / glass-product (MIT, github.com/tsogjavklann/awwwards-3d)
-  Three.js r170 + GSAP 3.12.5 + Lenis 1.1
-  Modèle 3D : si un fichier dent.glb est placé à côté de cette page, il remplace la dent intégrée.
+  Parcours mixte vertical / horizontal (référence : wonjyou.studio)
+  Rendu 3D repris de awwwards-3d / glass-product (MIT, github.com/tsogjavklann/awwwards-3d)
+  Mise en scène 3D inspirée de South Cliff Dental Group (Awwwards HM 2026)
+  Three.js r170 + GSAP 3.12.5 + Lenis 1.1 — polices Newsreader (Google Fonts) et Switzer (Fontshare)
+  Un fichier dent.glb placé à côté de cette page remplace la dent intégrée.
 -->
 <html lang="fr-CA">
 <head>
@@ -14,276 +16,295 @@
 <meta name="description" content="Clinique dentaire familiale au 7335, boulevard Langelier, Saint-Léonard. Ouvert le soir jeudi et vendredi.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --abysse:#0B2224;      /* scène : vert-bleu profond, pas du noir */
-  --abysse-2:#123236;
-  --porcelaine:#EEF1EF;
-  --pin:#14251F;
-  --pin-doux:#4A5C55;
+  --abysse:#0B2224;
+  --porcelaine:#EDF0EE;
+  --encre:#13201C;
+  --encre-douce:#56655F;
   --brume:#B9CCC9;
-  --gencive:#E7A9A8;
-  --gencive-fonce:#B9605F;
-  --gouttiere:clamp(16px,4vw,56px);
+  --trait:rgba(19,32,28,.16);
+  --gencive:#E39C9B;
+  --gencive-fonce:#A9504F;
+  --g:clamp(18px,3.6vw,56px);
+  --serif:"Newsreader",Georgia,serif;
+  --sans:"Switzer",system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overscroll-behavior:none;background:var(--abysse)}
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
-body{
-  color:var(--porcelaine);
-  font-family:"Bricolage Grotesque",system-ui,sans-serif;
-  font-size:clamp(16px,1.05vw,18px);line-height:1.55;
-  -webkit-font-smoothing:antialiased;overflow-x:hidden;
-}
+body{color:var(--porcelaine);font-family:var(--sans);font-size:clamp(15px,1vw,17px);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
-:focus-visible{outline:3px solid var(--gencive);outline-offset:3px;border-radius:4px}
-
+:focus-visible{outline:2px solid var(--gencive);outline-offset:4px}
 #webgl{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 
-/* ---------- préchargeur ---------- */
-#prechargeur{
-  position:fixed;inset:0;z-index:50;background:var(--abysse);
-  display:flex;flex-direction:column;justify-content:flex-end;
-  padding:var(--gouttiere);transition:opacity .7s ease,visibility .7s;
-}
+/* préchargeur */
+#prechargeur{position:fixed;inset:0;z-index:50;background:var(--abysse);display:flex;flex-direction:column;justify-content:flex-end;padding:var(--g);transition:opacity .8s,visibility .8s}
 #prechargeur.fini{opacity:0;visibility:hidden}
-.compteur{
-  font-weight:760;font-variation-settings:"wdth" 75;
-  font-size:clamp(5rem,22vw,20rem);line-height:.8;letter-spacing:-.05em;
-  font-variant-numeric:tabular-nums;color:var(--brume);
-}
-.barre{height:1.5px;background:rgba(185,204,201,.2);margin-top:24px}
+.compteur{font-family:var(--serif);font-weight:300;font-size:clamp(6rem,24vw,22rem);line-height:.78;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--brume)}
+.barre{height:1px;background:rgba(185,204,201,.2);margin-top:28px}
 .barre i{display:block;height:100%;width:0;background:var(--porcelaine);transition:width .25s}
 
-/* ---------- en-tête ---------- */
-header{
-  position:fixed;top:0;left:0;right:0;z-index:20;
-  display:flex;justify-content:space-between;align-items:center;gap:16px;
-  padding:20px var(--gouttiere);
-  transition:color .4s,background .4s;
-}
-header.clair{color:var(--pin);background:rgba(238,241,239,.86);backdrop-filter:blur(10px)}
-.marque{font-weight:700;font-variation-settings:"wdth" 80;font-size:1.12rem;text-decoration:none;line-height:1.05}
-.marque span{display:block;font-weight:400;font-variation-settings:"wdth" 100;font-size:.8rem;opacity:.7}
-nav{display:flex;gap:26px;align-items:center}
-nav a.lien{text-decoration:none;font-size:.95rem}
-nav a.lien:hover{text-decoration:underline;text-underline-offset:4px}
-.appel{
-  display:inline-flex;white-space:nowrap;align-items:center;
-  background:var(--porcelaine);color:var(--pin);text-decoration:none;
-  padding:12px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
-}
-header.clair .appel{background:var(--pin);color:var(--porcelaine)}
+/* en-tête : texte seul, qui change de couleur selon le fond */
+header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:22px var(--g);mix-blend-mode:difference;color:#fff}
+.marque{font-family:var(--serif);font-size:1.25rem;font-weight:400;text-decoration:none;letter-spacing:-.01em}
+nav{display:flex;gap:clamp(16px,2.4vw,40px);align-items:baseline;font-size:.92rem}
+nav a{text-decoration:none;position:relative}
+nav a::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s cubic-bezier(.7,0,.2,1)}
+nav a:hover::after{transform:scaleX(1);transform-origin:left}
 @media (max-width:760px){nav a.lien{display:none}}
 
-/* ---------- chapitres sur la scène 3D ---------- */
 main{position:relative;z-index:1}
-.chapitre{
-  min-height:100vh;min-height:100svh;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  padding:110px var(--gouttiere) clamp(36px,7vh,72px);
-}
-.chapitre h1,.chapitre h2{
-  font-weight:760;font-variation-settings:"wdth" 75,"opsz" 96;
-  letter-spacing:-.035em;line-height:.86;
-}
-.chapitre h1{font-size:clamp(3.2rem,10.5vw,10.5rem);max-width:11ch}
-.chapitre h2{font-size:clamp(2.6rem,7.4vw,7.2rem);max-width:13ch}
-.chapitre.droite{align-items:flex-end;text-align:right}
-.chapitre.droite p{margin-left:auto}
-.chapitre p.suite{margin-top:22px;max-width:38ch;font-size:clamp(1.05rem,1.4vw,1.25rem);color:var(--brume)}
-.ligne{display:block;overflow:hidden;padding-bottom:.05em}
-.ligne > span{display:block}
-.reperes{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;
-  margin-top:clamp(28px,5vh,52px);padding-top:18px;border-top:1.5px solid rgba(185,204,201,.35);
-  color:var(--brume);
-}
-.reperes strong{display:block;color:var(--porcelaine);font-weight:650}
-.etat{display:inline-flex;align-items:center;gap:8px}
-.etat::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--brume)}
-.etat.ouvert::before{background:#5BD39A;box-shadow:0 0 0 4px rgba(91,211,154,.2)}
-@media (max-width:760px){.reperes{grid-template-columns:1fr;gap:12px}}
 
-/* ---------- contenu clair qui recouvre la scène ---------- */
-.papier{
-  position:relative;z-index:2;background:var(--porcelaine);color:var(--pin);
-  border-radius:clamp(22px,3vw,40px) clamp(22px,3vw,40px) 0 0;
-}
-.soins{
-  display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);
-  gap:var(--gouttiere);padding:clamp(80px,14vh,160px) var(--gouttiere);
-}
-.soins-intro{position:sticky;top:120px;align-self:start}
-.papier h2{
-  font-weight:720;font-variation-settings:"wdth" 75,"opsz" 72;
-  font-size:clamp(2.2rem,4.6vw,4.4rem);line-height:.95;letter-spacing:-.025em;
-}
-.soins-intro p{margin-top:18px;max-width:34ch;color:var(--pin-doux)}
-.liste-soins{list-style:none;border-top:1.5px solid var(--pin)}
-.liste-soins li{
-  padding:28px 0 30px;border-bottom:1.5px solid var(--pin);
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:baseline;
-}
-.liste-soins h3{font-weight:650;font-variation-settings:"wdth" 82;font-size:clamp(1.5rem,2.5vw,2.3rem);line-height:1.02;letter-spacing:-.015em}
-.liste-soins p{color:var(--pin-doux);max-width:40ch}
-@media (max-width:900px){
-  .soins{grid-template-columns:1fr}.soins-intro{position:static}
-  .liste-soins li{grid-template-columns:1fr;gap:8px}
-}
-.avis{
-  padding:clamp(40px,8vh,100px) var(--gouttiere) clamp(80px,14vh,160px);
-  display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--gouttiere);
-}
-.note{font-size:clamp(1.15rem,1.6vw,1.4rem);margin-top:22px;max-width:30ch}
-.note a{text-underline-offset:4px}
-.echos{list-style:none;display:grid;gap:34px;align-content:start}
-.echos li{font-size:clamp(1.15rem,1.55vw,1.4rem);line-height:1.35;padding-left:22px;border-left:3px solid var(--gencive-fonce)}
-.echos small{display:block;margin-top:8px;font-size:.85rem;color:var(--pin-doux)}
-@media (max-width:900px){.avis{grid-template-columns:1fr}}
-.visite{
-  background:var(--gencive);margin:0 var(--gouttiere);
-  border-radius:clamp(22px,3vw,40px) clamp(22px,3vw,40px) 0 0;
-  padding:clamp(56px,9vw,120px) clamp(22px,5vw,80px);
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(36px,6vw,90px);
-}
-.visite h2{max-width:10ch}
-.visite .appel{margin-top:30px;font-size:1.05rem;padding:16px 26px;background:var(--pin);color:var(--porcelaine)}
-.adresse{margin-top:30px;font-size:1.1rem;line-height:1.45}
-.adresse a{text-underline-offset:4px}
-table{width:100%;border-collapse:collapse;font-size:1.05rem}
-caption{text-align:left;font-weight:650;font-size:1.2rem;margin-bottom:12px}
-td{padding:12px 0;border-bottom:1.5px solid rgba(20,37,31,.28)}
-td:last-child{text-align:right;font-variant-numeric:tabular-nums}
-tr.aujourdhui td{font-weight:700}
-tr.aujourdhui td:first-child::after{content:" (aujourd’hui)";font-weight:400}
-@media (max-width:900px){.visite{grid-template-columns:1fr}}
-footer{
-  background:var(--pin);color:var(--brume);
-  padding:40px var(--gouttiere);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:.9rem;
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ─── 1. récit vertical sur la scène 3D ─── */
+.recit{height:480vh;position:relative}
+.collant{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.ch{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:120px var(--g) clamp(34px,6vh,64px);pointer-events:none}
+.ch h1,.ch h2{font-family:var(--serif);font-weight:300;letter-spacing:-.035em;line-height:.9}
+.ch h1{font-size:clamp(2.5rem,8.4vw,9.4rem)}
+.ch h1 .ligne > span{white-space:nowrap}
+.ch h2{font-size:clamp(2.6rem,6.4vw,6.6rem);max-width:11ch}
+.ch p.suite{margin-top:24px;max-width:34ch;font-size:clamp(1rem,1.25vw,1.15rem);color:var(--brume)}
+.ch.droite{align-items:flex-end;text-align:right}
+.ch.haut{justify-content:flex-start;padding-top:clamp(110px,15vh,150px)}
+.ligne{display:block;overflow:hidden;padding-bottom:.08em}
+.ligne > span{display:block;will-change:transform}
+.reperes{display:flex;gap:clamp(24px,5vw,80px);flex-wrap:wrap;margin-top:clamp(28px,5vh,48px);font-size:.95rem;color:var(--brume)}
+.reperes span b{display:block;color:var(--porcelaine);font-weight:500}
+.etat{display:inline-flex;align-items:center;gap:8px}
+.etat::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brume)}
+.etat.ouvert::before{background:#5BD39A}
+.etiquette{position:absolute;left:0;top:0;display:flex;flex-direction:row-reverse;align-items:center;gap:12px;font-size:.92rem;white-space:nowrap;opacity:0;pointer-events:none;will-change:transform}
+.etiquette::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--porcelaine);box-shadow:0 0 0 6px rgba(237,240,238,.14)}
+.etiquette i{display:block;width:clamp(28px,5vw,80px);height:1px;background:rgba(237,240,238,.55)}
+.etiquette b{font-family:var(--serif);font-weight:400;font-size:1.3rem;display:block;line-height:1.1}
+.etiquette small{display:block;color:var(--brume);font-size:.8rem}
+.etiquette.pulpe::before{background:var(--gencive)}
+@media (max-width:760px){.etiquette{display:none}}
+.defile{position:absolute;right:var(--g);bottom:clamp(34px,6vh,64px);font-size:.82rem;color:var(--brume);display:flex;align-items:center;gap:12px}
+.defile::after{content:"";width:1px;height:46px;background:linear-gradient(var(--brume),transparent);animation:goutte 2.2s ease-in-out infinite}
+@keyframes goutte{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media (max-width:760px){.defile{display:none}}
+
+/* ─── sections claires ─── */
+.clair{position:relative;z-index:2;background:var(--porcelaine);color:var(--encre)}
+
+/* ─── 2. piste horizontale : les soins ─── */
+.horiz{height:100vh;height:100svh;overflow:hidden;position:relative}
+.piste{display:flex;height:100%;width:max-content;will-change:transform}
+.panneau{height:100%;flex:none;display:flex;flex-direction:column;justify-content:space-between;padding:110px var(--g) clamp(34px,6vh,64px)}
+.ouverture{width:min(78vw,1100px)}
+.ouverture h2{font-family:var(--serif);font-weight:300;font-size:clamp(3.2rem,9vw,9.6rem);line-height:.88;letter-spacing:-.04em;max-width:8ch}
+.ouverture p{max-width:36ch;font-size:clamp(1rem,1.3vw,1.2rem);color:var(--encre-douce)}
+.soin{width:clamp(300px,34vw,560px);border-left:1px solid var(--trait)}
+.soin h3{font-family:var(--serif);font-weight:300;font-size:clamp(2.2rem,3.6vw,3.8rem);line-height:.95;letter-spacing:-.03em}
+.soin p{max-width:30ch;color:var(--encre-douce);font-size:clamp(1rem,1.15vw,1.1rem)}
+.soin .pour{font-size:.85rem;color:var(--encre-douce);display:flex;justify-content:space-between;gap:16px;padding-top:14px;border-top:1px solid var(--trait);margin-top:28px}
+.soin .pour b{font-weight:500;color:var(--encre)}
+.soin.urgence{background:var(--encre);color:var(--porcelaine);border-left:0}
+.soin.urgence p,.soin.urgence .pour{color:var(--brume)}
+.soin.urgence .pour{border-color:rgba(237,240,238,.2)}
+.soin.urgence .pour b{color:var(--gencive)}
+.soin.urgence a{font-family:var(--serif);font-size:clamp(1.8rem,2.6vw,2.6rem);text-decoration:none;border-bottom:1px solid var(--gencive);align-self:flex-start}
+@media (max-width:760px){.ouverture{width:88vw}.soin{width:82vw}}
+
+/* ─── 3. vertical : la phrase qui se remplit ─── */
+.temoin{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:clamp(90px,14vh,160px) var(--g)}
+.temoin blockquote{font-family:var(--serif);font-weight:300;font-size:clamp(2.2rem,5.4vw,5.8rem);line-height:1;letter-spacing:-.03em;max-width:16ch}
+.temoin blockquote .mot{color:rgba(19,32,28,.14);transition:none}
+.temoin footer{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-top:clamp(36px,7vh,80px);font-size:1rem;color:var(--encre-douce)}
+.temoin .note{font-family:var(--serif);font-size:clamp(3rem,7vw,7rem);line-height:.8;color:var(--encre);letter-spacing:-.04em}
+.temoin .note small{font-family:var(--sans);font-size:1rem;letter-spacing:0;color:var(--encre-douce);margin-left:10px}
+.autres{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,5vw,90px);margin-top:clamp(48px,9vh,110px)}
+.autres p{font-family:var(--serif);font-size:clamp(1.3rem,1.9vw,1.9rem);line-height:1.2;letter-spacing:-.01em}
+.autres small{display:block;font-family:var(--sans);font-size:.85rem;color:var(--encre-douce);margin-top:10px;letter-spacing:0}
+@media (max-width:760px){.autres{grid-template-columns:1fr}}
+
+/* ─── 4. piste horizontale : la semaine ─── */
+.semaine .panneau{justify-content:flex-end}
+.titre-semaine{width:min(60vw,820px);justify-content:space-between!important}
+.titre-semaine h2{font-family:var(--serif);font-weight:300;font-size:clamp(3rem,7.4vw,8rem);line-height:.88;letter-spacing:-.04em;max-width:7ch}
+.titre-semaine p{max-width:30ch;color:var(--encre-douce)}
+.jour{width:clamp(170px,17vw,280px);border-left:1px solid var(--trait);gap:10px}
+.jour .nom{font-size:.95rem;color:var(--encre-douce)}
+.jour .h{font-family:var(--serif);font-weight:300;font-size:clamp(1.9rem,2.9vw,3.3rem);line-height:.9;letter-spacing:-.03em;white-space:nowrap}
+.jour .barre-h{height:calc(var(--duree) * 3.6vh);background:var(--encre);opacity:.08;margin-bottom:18px;transform-origin:bottom}
+.jour.soir .barre-h{background:var(--gencive);opacity:1}
+.jour.ferme .h{color:var(--encre-douce)}
+.jour.ajd .nom::after{content:" · aujourd’hui";color:var(--gencive-fonce)}
+.venez{width:min(86vw,1100px);background:var(--gencive);color:var(--encre);justify-content:space-between!important}
+.venez h2{font-family:var(--serif);font-weight:300;font-size:clamp(3rem,7.4vw,8rem);line-height:.88;letter-spacing:-.04em}
+.venez .bas{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;flex-wrap:wrap}
+.venez address{font-style:normal;font-size:clamp(1.05rem,1.4vw,1.3rem);line-height:1.45}
+.venez a.tel{font-family:var(--serif);font-size:clamp(2rem,3.6vw,3.8rem);text-decoration:none;letter-spacing:-.02em;border-bottom:1px solid var(--encre)}
+@media (max-width:760px){.titre-semaine{width:86vw}.jour{width:44vw}}
+
+/* ─── 5. pied ─── */
+.pied{background:var(--encre);color:var(--brume);padding:clamp(70px,12vh,140px) var(--g) 34px;position:relative;z-index:2}
+.pied a.grand{display:block;font-family:var(--serif);font-weight:300;font-size:clamp(3.2rem,12vw,13rem);line-height:.85;letter-spacing:-.05em;color:var(--porcelaine);text-decoration:none}
+.pied .ligne-bas{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(50px,9vh,110px);font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 
-<div id="prechargeur" aria-hidden="true">
-  <div class="compteur">0</div>
-  <div class="barre"><i></i></div>
-</div>
-
+<div id="prechargeur" aria-hidden="true"><div class="compteur">0</div><div class="barre"><i></i></div></div>
 <canvas id="webgl" aria-hidden="true"></canvas>
 
-<header id="entete">
-  <a class="marque" href="#">Centre Dentaire Langelier<span>Saint-Léonard</span></a>
+<header>
+  <a class="marque" href="#">Langelier</a>
   <nav aria-label="Navigation principale">
     <a class="lien" href="#soins">Soins</a>
     <a class="lien" href="#avis">Avis</a>
-    <a class="lien" href="#visite">Horaires et adresse</a>
-    <a class="appel" href="tel:+15142555511">514 255-5511</a>
+    <a class="lien" href="#semaine">Horaires</a>
+    <a href="tel:+15142555511">514 255-5511</a>
   </nav>
 </header>
 
 <main>
-  <section class="chapitre" id="ch1">
-    <h1>
-      <span class="ligne"><span>Trois</span></span>
-      <span class="ligne"><span>générations</span></span>
-      <span class="ligne"><span>de sourires.</span></span>
-    </h1>
-    <div class="reperes">
-      <p><strong>Clinique familiale</strong>Des familles du quartier nous confient leurs dents depuis plus de 20 ans.</p>
-      <p><strong>7335, boulevard Langelier</strong>Saint-Léonard, Montréal</p>
-      <p><strong class="etat" id="etat">Horaires</strong><span id="etat-detail">Ouvert le soir jeudi et vendredi, jusqu’à 21 h.</span></p>
+  <!-- 1. vertical, scène 3D -->
+  <section class="recit" id="recit" aria-label="Présentation">
+    <div class="collant">
+      <div class="ch" id="ch0">
+        <h1><span class="ligne"><span>Trois générations</span></span><span class="ligne"><span>de sourires</span></span><span class="ligne"><span>à Saint&#8209;Léonard.</span></span></h1>
+        <div class="reperes">
+          <span><b>Centre Dentaire Langelier</b>7335, boulevard Langelier</span>
+          <span><b class="etat" id="etat">Horaires</b><span id="etat-detail">Ouvert le soir jeudi et vendredi.</span></span>
+        </div>
+      </div>
+      <div class="ch droite" id="ch1">
+        <h2><span class="ligne"><span>Ce qu’on voit,</span></span><span class="ligne"><span>on vous</span></span><span class="ligne"><span>l’explique.</span></span></h2>
+        <p class="suite">Avant chaque soin, on vous montre ce qui se passe et on vous donne le prix. Sans jargon.</p>
+      </div>
+      <div class="ch haut" id="ch2">
+        <h2><span class="ligne"><span>Une main légère,</span></span><span class="ligne"><span>même pour</span></span><span class="ligne"><span>un canal.</span></span></h2>
+        <p class="suite">Quand l’infection atteint la pulpe, on la retire avec précision pour garder votre dent.</p>
+      </div>
+      <div class="etiquette" data-a="email"><i></i><span><b>Émail</b><small>La couche qui vous protège</small></span></div>
+      <div class="etiquette" data-a="dentine"><i></i><span><b>Dentine</b><small>Le cœur de la dent</small></span></div>
+      <div class="etiquette pulpe" data-a="pulpe"><i></i><span><b>Pulpe et canaux</b><small>Ce qu’on soigne lors d’un canal</small></span></div>
+      <span class="defile" id="defile">Défilez</span>
     </div>
   </section>
 
-  <section class="chapitre droite" id="ch2">
-    <h2>Une main légère, même pour un canal.</h2>
-    <p class="suite">C’est ce que nos patients écrivent le plus souvent. Des gestes précis, sans brusquer, et le temps de vous expliquer chaque option.</p>
-  </section>
-
-  <section class="chapitre" id="ch3">
-    <h2>Ouvert jusqu’à 21&nbsp;h, jeudi et vendredi.</h2>
-    <p class="suite">Pour venir après le travail ou l’école, sans prendre congé.</p>
-  </section>
-
-  <div class="papier" id="papier">
-    <section class="soins" id="soins">
-      <div class="soins-intro">
+  <!-- 2. horizontal, les soins -->
+  <section class="clair horiz" id="soins" aria-label="Nos soins">
+    <div class="piste">
+      <div class="panneau ouverture">
         <h2>Ce qu’on fait pour vous</h2>
         <p>Du premier rendez-vous de votre enfant au traitement plus complexe, tout se fait ici, avec la même équipe.</p>
       </div>
-      <ul class="liste-soins">
-        <li><h3>Examens et nettoyage</h3><p>Le suivi régulier qui évite les mauvaises surprises. On vous explique ce qu’on voit, sans jargon.</p></li>
-        <li><h3>Traitements de canal</h3><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p></li>
-        <li><h3>Urgences</h3><p>Une dent cassée, une douleur soudaine&nbsp;: appelez-nous, on trouve une place rapidement.</p></li>
-        <li><h3>Soins pour enfants</h3><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p></li>
-        <li><h3>Plans de traitement et assurances</h3><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p></li>
-      </ul>
-    </section>
+      <article class="panneau soin">
+        <h3>Examens et nettoyage</h3>
+        <div><p>Le suivi régulier qui évite les mauvaises surprises. On vous explique ce qu’on voit.</p><div class="pour"><span>Pour</span><b>Toute la famille</b></div></div>
+      </article>
+      <article class="panneau soin">
+        <h3>Traitements de canal</h3>
+        <div><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p><div class="pour"><span>Ce qu’on en dit</span><b>« Je n’ai presque rien senti »</b></div></div>
+      </article>
+      <article class="panneau soin">
+        <h3>Soins pour enfants</h3>
+        <div><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p><div class="pour"><span>Pour</span><b>Dès la première dent</b></div></div>
+      </article>
+      <article class="panneau soin">
+        <h3>Prix et assurances</h3>
+        <div><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p><div class="pour"><span>Avant le soin</span><b>Prix annoncé</b></div></div>
+      </article>
+      <article class="panneau soin urgence">
+        <h3>Une urgence&nbsp;?</h3>
+        <div><p>Une dent cassée, une douleur soudaine&nbsp;: appelez, on trouve une place rapidement.</p><a href="tel:+15142555511">514 255-5511</a></div>
+      </article>
+    </div>
+  </section>
 
-    <section class="avis" id="avis">
-      <div>
-        <h2>Ce que nos patients racontent</h2>
-        <p class="note">Une note de 4,9 sur 5, selon 167 avis sur <a href="https://www.google.com/maps/place/?q=place_id:ChIJdRRziIgeyUwRzTTNTfoTSVg">Google</a>.</p>
-      </div>
-      <ul class="echos">
-        <li>Une main légère, même pendant un traitement de canal.<small>Ce qui revient dans les avis sur le Dr Luu</small></li>
-        <li>Des parents, leurs enfants et maintenant leurs petits-enfants, soignés par la même clinique.<small>Un patient depuis plus de 20 ans</small></li>
-        <li>Une réception qui démêle les assurances et annonce le prix avant de commencer.<small>Ce qui revient dans plusieurs avis</small></li>
-      </ul>
-    </section>
-
-    <section class="visite" id="visite">
-      <div>
-        <h2>Venez nous voir</h2>
-        <p class="adresse">7335, boulevard Langelier<br>Saint-Léonard (Québec) H1S 1V7<br><a href="https://www.google.com/maps/search/?api=1&query=7335+Boulevard+Langelier+Saint-L%C3%A9onard+QC">Voir l’itinéraire</a></p>
-        <a class="appel" href="tel:+15142555511">Appeler pour un rendez-vous</a>
-      </div>
-      <table>
-        <caption>Heures d’ouverture</caption>
-        <tbody id="horaires">
-          <tr data-j="1"><td>Lundi</td><td>10 h à 17 h</td></tr>
-          <tr data-j="2"><td>Mardi</td><td>10 h à 17 h</td></tr>
-          <tr data-j="3"><td>Mercredi</td><td>10 h à 17 h</td></tr>
-          <tr data-j="4"><td>Jeudi</td><td>10 h à 21 h</td></tr>
-          <tr data-j="5"><td>Vendredi</td><td>10 h à 21 h</td></tr>
-          <tr data-j="6"><td>Samedi</td><td>10 h à 17 h</td></tr>
-          <tr data-j="0"><td>Dimanche</td><td>Fermé</td></tr>
-        </tbody>
-      </table>
-    </section>
-
+  <!-- 3. vertical, la phrase qui se remplit -->
+  <section class="clair temoin" id="avis" aria-label="Avis">
+    <blockquote id="phrase">Des parents, leurs enfants et maintenant leurs petits-enfants, soignés par la même clinique.</blockquote>
     <footer>
-      <span>Centre Dentaire Langelier, 7335, boulevard Langelier, Saint-Léonard</span>
-      <span>Maquette proposée par Spiralia</span>
+      <span>Un patient depuis plus de 20 ans, sur Google</span>
+      <span class="note">4,9<small>sur 5, 167 avis</small></span>
     </footer>
-  </div>
+    <div class="autres">
+      <p>Une main légère, même pendant un traitement de canal.<small>Ce qui revient dans les avis sur le Dr Luu</small></p>
+      <p>Une réception qui démêle les assurances et annonce le prix avant de commencer.<small>Ce qui revient dans plusieurs avis</small></p>
+    </div>
+  </section>
+
+  <!-- 4. horizontal, la semaine -->
+  <section class="clair horiz semaine" id="semaine" aria-label="Heures d’ouverture">
+    <div class="piste">
+      <div class="panneau titre-semaine">
+        <h2>Votre semaine avec nous</h2>
+        <p>Deux soirs par semaine jusqu’à 21 h, pour venir après le travail ou l’école.</p>
+      </div>
+      <div class="panneau jour" data-j="1" style="--duree:7"><div class="barre-h"></div><span class="nom">Lundi</span><span class="h">10–17&nbsp;h</span></div>
+      <div class="panneau jour" data-j="2" style="--duree:7"><div class="barre-h"></div><span class="nom">Mardi</span><span class="h">10–17&nbsp;h</span></div>
+      <div class="panneau jour" data-j="3" style="--duree:7"><div class="barre-h"></div><span class="nom">Mercredi</span><span class="h">10–17&nbsp;h</span></div>
+      <div class="panneau jour soir" data-j="4" style="--duree:11"><div class="barre-h"></div><span class="nom">Jeudi</span><span class="h">10–21&nbsp;h</span></div>
+      <div class="panneau jour soir" data-j="5" style="--duree:11"><div class="barre-h"></div><span class="nom">Vendredi</span><span class="h">10–21&nbsp;h</span></div>
+      <div class="panneau jour" data-j="6" style="--duree:7"><div class="barre-h"></div><span class="nom">Samedi</span><span class="h">10–17&nbsp;h</span></div>
+      <div class="panneau jour ferme" data-j="0" style="--duree:0"><div class="barre-h"></div><span class="nom">Dimanche</span><span class="h">Fermé</span></div>
+      <div class="panneau venez" id="visite">
+        <h2>Venez nous voir</h2>
+        <div class="bas">
+          <address>7335, boulevard Langelier<br>Saint-Léonard (Québec) H1S 1V7<br><a href="https://www.google.com/maps/search/?api=1&query=7335+Boulevard+Langelier+Saint-L%C3%A9onard+QC">Voir l’itinéraire</a></address>
+          <a class="tel" href="tel:+15142555511">514 255-5511</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. pied -->
+  <footer class="pied">
+    <a class="grand" href="tel:+15142555511">514 255-5511</a>
+    <div class="ligne-bas"><span>Centre Dentaire Langelier, 7335, boulevard Langelier, Saint-Léonard</span><span>Maquette proposée par Spiralia</span></div>
+  </footer>
 </main>
 
 <script>
-/* état ouvert / fermé, heure de Montréal */
 (function(){
   const h={0:null,1:[10,17],2:[10,17],3:[10,17],4:[10,21],5:[10,21],6:[10,17]};
   const now=new Date(new Date().toLocaleString("en-US",{timeZone:"America/Toronto"}));
   const j=now.getDay(),heure=now.getHours()+now.getMinutes()/60;
-  const row=document.querySelector('#horaires tr[data-j="'+j+'"]'); if(row) row.classList.add("aujourdhui");
+  const col=document.querySelector('.jour[data-j="'+j+'"]'); if(col) col.classList.add("ajd");
   const etat=document.getElementById("etat"),det=document.getElementById("etat-detail"),p=h[j];
   if(p&&heure>=p[0]&&heure<p[1]){etat.textContent="Ouvert maintenant";etat.classList.add("ouvert");det.textContent="Jusqu’à "+p[1]+" h aujourd’hui.";}
-  else{
-    etat.textContent="Fermé en ce moment";
-    const noms=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
-    for(let i=0;i<7;i++){const d=(j+i)%7,q=h[d];if(q&&(i>0||heure<q[0])){det.textContent="On ouvre "+(i===0?"aujourd’hui":i===1?"demain":noms[d])+" à "+q[0]+" h.";break;}}
-  }
+  else{etat.textContent="Fermé en ce moment";const noms=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+    for(let i=0;i<7;i++){const d=(j+i)%7,q=h[d];if(q&&(i>0||heure<q[0])){det.textContent="On ouvre "+(i===0?"aujourd’hui":i===1?"demain":noms[d])+" à "+q[0]+" h.";break;}}}
+  // la phrase : un mot = un span
+  const q=document.getElementById("phrase");
+  q.innerHTML=q.textContent.split(" ").map(m=>'<span class="mot">'+m+'</span>').join(" ");
 })();
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<!-- parcours mixte : pistes horizontales épinglées et phrase qui se remplit -->
+<script>
+(function(){
+  const gsap=window.gsap; if(!gsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+  document.querySelectorAll(".horiz").forEach(sec=>{
+    const piste=sec.querySelector(".piste");
+    const dist=()=>Math.max(0,piste.scrollWidth-innerWidth);
+    const tw=gsap.to(piste,{x:()=>-dist(),ease:"none",scrollTrigger:{trigger:sec,pin:true,start:"top top",end:()=>"+="+dist(),scrub:1,invalidateOnRefresh:true,anticipatePin:1}});
+    // les barres d’heures montent quand leur colonne entre à l’écran
+    sec.querySelectorAll(".barre-h").forEach(b=>{
+      gsap.from(b,{scaleY:0,ease:"power3.out",duration:1,scrollTrigger:{trigger:b.closest(".jour"),containerAnimation:tw,start:"left 85%"}});
+    });
+    sec.querySelectorAll(".soin h3, .jour .h").forEach(t=>{
+      gsap.from(t,{yPercent:30,opacity:0,ease:"power3.out",duration:1,scrollTrigger:{trigger:t.closest(".panneau"),containerAnimation:tw,start:"left 80%"}});
+    });
+  });
+  gsap.to("#phrase .mot",{color:"#13201C",stagger:.1,ease:"none",scrollTrigger:{trigger:"#avis",start:"top 70%",end:"center 45%",scrub:1}});
+})();
+</script>
+
 <script type="importmap">
 {"imports":{
   "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -303,11 +324,20 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
 const gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
 const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const mobile = () => innerWidth < 760;
+const estMobile = () => innerWidth < 760;
 const pre = document.getElementById("prechargeur");
 const compteur = pre.querySelector(".compteur"), barre = pre.querySelector(".barre i");
 
-/* ── rendu ─────────────────────────────────────────── */
+let lenis = null;
+if (gsap && window.Lenis && !reduit) {
+  lenis = new Lenis({duration:1.2, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
+  document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{
+    const id=a.getAttribute("href"); if(id.length>1){e.preventDefault();lenis.scrollTo(id);}
+  }));
+}
+
 const canvas = document.getElementById("webgl");
 let renderer;
 try { renderer = new THREE.WebGLRenderer({canvas, antialias:false, powerPreference:"high-performance"}); }
@@ -319,102 +349,89 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
+renderer.localClippingEnabled = true;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0B2224);
 const camera = new THREE.PerspectiveCamera(28, innerWidth/innerHeight, 0.1, 100);
-camera.position.set(0, 0.15, 7);
-
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 pmrem.dispose();
-
 const rim = new THREE.DirectionalLight(0xbfe6ff, 2.2); rim.position.set(-3,4,-4); scene.add(rim);
-const fill = new THREE.DirectionalLight(0xffd6cf, 0.9); fill.position.set(4,1,3); scene.add(fill);
+const fill = new THREE.DirectionalLight(0xffd6cf, 1.0); fill.position.set(4,1,3); scene.add(fill);
 
-/* halo rose gencive derrière la dent, pour que la transmission ait quelque chose à réfracter */
-const halo = new THREE.Mesh(
-  new THREE.PlaneGeometry(9,9),
-  new THREE.ShaderMaterial({
-    transparent:true, depthWrite:false,
-    uniforms:{uT:{value:0}},
-    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader:`varying vec2 vUv;uniform float uT;
-      void main(){vec2 p=vUv-.5;float d=length(p*vec2(1.,1.15));
-        float a=smoothstep(.5,.0,d)*.3;
-        vec3 c=mix(vec3(.91,.66,.66),vec3(.35,.62,.6),smoothstep(-.3,.3,p.y+sin(uT*.3)*.05));
-        gl_FragColor=vec4(c,a);}`
-  })
-);
-halo.position.z = -2.2; scene.add(halo);
+/* décor typographique dans la scène, réfracté par l’émail */
+function toileTexte(){
+  const c = document.createElement("canvas"); c.width = 3072; c.height = 1728;
+  const g = c.getContext("2d");
+  const rad = g.createRadialGradient(2000,860,80,1700,860,1900);
+  rad.addColorStop(0,"#2D5558"); rad.addColorStop(.45,"#173A3D"); rad.addColorStop(1,"#0B2224");
+  g.fillStyle = rad; g.fillRect(0,0,c.width,c.height);
+  g.fillStyle = "#3F6C6E"; g.textBaseline = "middle"; g.textAlign = "center";
+  g.font = '300 900px Newsreader, Georgia, serif';
+  g.fillText("Langelier", 1536, 800);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+const decor = new THREE.Mesh(new THREE.PlaneGeometry(22, 12.375), new THREE.MeshBasicMaterial({map: toileTexte(), toneMapped:false}));
+scene.add(decor);
+document.fonts && document.fonts.load('300 100px Newsreader').then(()=>{ decor.material.map = toileTexte(); decor.material.needsUpdate = true; }).catch(()=>{});
 
-const stage = new THREE.Group(); scene.add(stage);
-
-/* ── matériau émail : porcelaine translucide à dispersion ── */
+/* trois couches anatomiques, coupées au défilement */
+const coupeEmail = new THREE.Plane(new THREE.Vector3(0,0,-1), 4);
+const coupeDentine = new THREE.Plane(new THREE.Vector3(0,0,-1), 4);
 const email = new THREE.MeshPhysicalMaterial({
-  color:0xFBF8F1, roughness:0.12, metalness:0,
-  transmission:0.55, thickness:1.4, ior:1.62, dispersion:0.8,
-  attenuationColor:new THREE.Color(0xF2E6D3), attenuationDistance:2.2,
-  clearcoat:1, clearcoatRoughness:0.06,
-  sheen:0.4, sheenColor:new THREE.Color(0xCFE8F2),
-  iridescence:0.12, envMapIntensity:1.25
+  color:0xFFFFFF, roughness:0.08, transmission:0.92, thickness:1.1, ior:1.62, dispersion:1.4,
+  attenuationColor:new THREE.Color(0xEFE4D2), attenuationDistance:1.6,
+  clearcoat:1, clearcoatRoughness:0.04, envMapIntensity:1.3, side:THREE.DoubleSide, clippingPlanes:[coupeEmail]
 });
+const dentine = new THREE.MeshPhysicalMaterial({ color:0xE9D6B0, roughness:0.45, sheen:0.5, sheenColor:new THREE.Color(0xFFF1D6), side:THREE.DoubleSide, clippingPlanes:[coupeDentine] });
+const pulpe = new THREE.MeshPhysicalMaterial({ color:0xD9686A, roughness:0.35, emissive:new THREE.Color(0x8A1E2A), emissiveIntensity:0.55, clearcoat:0.6 });
 
-/* ── dent intégrée : métaballes fusionnées, une seule surface sans couture ── */
-function dentIntegree(){
-  const mc = new MarchingCubes(72, email, false, false, 200000);
-  mc.isolation = 60;
-  mc.reset();
-  const B = (x,y,z,s) => mc.addBall(0.5+x, 0.5+y, 0.5+z, s, 12);
-  // corps de la couronne
+const coucheDent = (mc, k) => {
+  const B = (x,y,z,s) => mc.addBall(0.5+x*k[0], 0.5+y, 0.5+z*k[0], s*k[1], 12);
   for (const [x,z] of [[-.06,-.05],[.06,-.05],[-.06,.05],[.06,.05],[0,0]]) B(x,.15,z,.42);
-  // cuspides
   for (const [x,z] of [[-.075,-.065],[.075,-.065],[-.075,.065],[.075,.065]]) B(x,.235,z,.2);
-  // collet
   B(0,.06,0,.34); B(-.04,.04,0,.18); B(.04,.04,0,.18);
-  // deux racines qui s'affinent et s'écartent légèrement
-  for (const sg of [-1,1]) {
-    for (let i=0;i<9;i++){
-      const t=i/8;
-      B(sg*(.05+.035*t+.02*t*t), -.01-.27*t, -.01*t, .16*(1-.72*t));
-    }
-  }
-  mc.update();
-  mc.scale.setScalar(1.75);
-  mc.position.y = -0.1;
+  for (const sg of [-1,1]) for (let i=0;i<9;i++){ const t=i/8; B(sg*(.05+.035*t+.02*t*t), -.01-.27*t, -.01*t, .16*(1-.72*t)); }
+};
+function maillage(mat, remplir, res=72){
+  const mc = new MarchingCubes(res, mat, false, false, 200000);
+  mc.isolation = 60; mc.reset(); remplir(mc); mc.update();
+  mc.scale.setScalar(1.75); mc.position.y = -0.1;
   return mc;
 }
-
+function dentIntegree(){
+  const g = new THREE.Group();
+  g.add(maillage(email, mc => coucheDent(mc,[1,1])));
+  g.add(maillage(dentine, mc => coucheDent(mc,[.86,.62]), 64));
+  g.add(maillage(pulpe, mc => {
+    const B = (x,y,z,s) => mc.addBall(0.5+x, 0.5+y, 0.5+z, s, 12);
+    B(0,.12,0,.07); B(-.035,.13,0,.045); B(.035,.13,0,.045); B(-.03,.17,-.02,.025); B(.03,.17,.02,.025);
+    for (const sg of [-1,1]) for (let i=0;i<10;i++){ const t=i/9; B(sg*(.03+.04*t+.02*t*t), .08-.33*t, -.01*t, .032*(1-.6*t)); }
+  }, 64));
+  return g;
+}
+const stage = new THREE.Group(); scene.add(stage);
 let dent = null;
 const manager = new THREE.LoadingManager();
-const charge = (o)=>{ dent = o; stage.add(o); };
 new GLTFLoader(manager).load("dent.glb",
-  (g)=>{
-    const o = g.scene;
-    const box = new THREE.Box3().setFromObject(o), taille = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
-    o.position.sub(c); const s = 1.7/Math.max(taille.x,taille.y,taille.z);
-    const w = new THREE.Group(); o.traverse(m=>{ if(m.isMesh) m.material = email; }); w.add(o); w.scale.setScalar(s);
-    charge(w);
-  },
-  undefined,
-  ()=> charge(dentIntegree())
-);
+  (g)=>{ const o=g.scene, box=new THREE.Box3().setFromObject(o), s=box.getSize(new THREE.Vector3()), c=box.getCenter(new THREE.Vector3());
+    o.position.sub(c); o.traverse(m=>{ if(m.isMesh) m.material = email; });
+    const w = new THREE.Group(); w.add(o); w.scale.setScalar(1.7/Math.max(s.x,s.y,s.z)); dent = w; stage.add(w); },
+  undefined, ()=>{ if(!dent){ dent = dentIntegree(); stage.add(dent); } });
 
-/* ── post-traitement (repris de la base awwwards-3d) ── */
-const cible = new THREE.WebGLRenderTarget(innerWidth, innerHeight, {type:THREE.HalfFloatType});
-const composer = new EffectComposer(renderer, cible);
-composer.setPixelRatio(Math.min(devicePixelRatio,2));
-composer.setSize(innerWidth, innerHeight);
+/* post-traitement */
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(innerWidth, innerHeight, {type:THREE.HalfFloatType}));
+composer.setPixelRatio(Math.min(devicePixelRatio,2)); composer.setSize(innerWidth, innerHeight);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 0.35, 0.5, 0.86);
-composer.addPass(bloom);
-const vignette = new ShaderPass({
-  uniforms:{tDiffuse:{value:null},uOffset:{value:.42},uDarkness:{value:.5}},
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 0.4, 0.55, 0.82); composer.addPass(bloom);
+composer.addPass(new ShaderPass({
+  uniforms:{tDiffuse:{value:null},uOffset:{value:.4},uDarkness:{value:.55}},
   vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
   fragmentShader:`uniform sampler2D tDiffuse;uniform float uOffset,uDarkness;varying vec2 vUv;
     void main(){vec4 c=texture2D(tDiffuse,vUv);float v=smoothstep(.85,uOffset,length(vUv-.5));gl_FragColor=vec4(mix(c.rgb*(1.-uDarkness),c.rgb,v),c.a);}`
-});
-composer.addPass(vignette);
+}));
 composer.addPass(new OutputPass());
 const grain = new ShaderPass({
   uniforms:{tDiffuse:{value:null},uTime:{value:0},uI:{value:.035}},
@@ -425,106 +442,107 @@ const grain = new ShaderPass({
 });
 composer.addPass(grain);
 
-/* ── état amorti ── */
-const st = {
-  x:{c:0,t:0}, y:{c:0,t:0}, rotY:{c:-.5,t:-.5}, rotX:{c:.25,t:.25}, camZ:{c:7,t:7}, ech:{c:1,t:1},
-  mx:{c:0,t:0}, my:{c:0,t:0}
-};
-const damp=(s,dt,e=.07)=>{ s.c += (s.t-s.c)*(1-Math.pow(1-e,dt*60)); };
-function poseDepart(){
-  st.x.t = mobile()? 0 : 1.3;
-  st.y.t = mobile()? .72 : .1;
-  st.ech.t = mobile()? .55 : 1;
-}
-poseDepart();
+/* mise en scène pilotée par le défilement */
+const S = { tx:1.25, ty:0, ech:1, rotY:-.5, rotX:.25, spin:1, orb:0, rayon:7, haut:.15, coupeE:4, coupeD:4, etiq:0 };
+const L = {}; for (const k in S) L[k] = S[k];
+const souris = {x:0,y:0,lx:0,ly:0};
+if (estMobile()) { Object.assign(S,{tx:0,ty:.75,ech:.55,rayon:7.6}); Object.assign(L,S); }
 
-/* ── défilement : chorégraphie par chapitre ── */
-let lenis = null;
-if (gsap && !reduit) {
-  gsap.registerPlugin(ScrollTrigger);
-  if (window.Lenis) {
-    lenis = new Lenis({duration:1.2, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
-    document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{
-      const id=a.getAttribute("href"); if(id.length>1){e.preventDefault();lenis.scrollTo(id,{offset:-70});}
-    }));
+let visible = true;
+if (gsap) {
+  const m = estMobile();
+  const lignes = id=>document.querySelectorAll(`#${id} .ligne > span`);
+  const suites = id=>document.querySelectorAll(`#${id} .suite, #${id} .reperes`);
+  gsap.set([...lignes("ch1"),...lignes("ch2")], {yPercent:110});
+  gsap.set(["#ch1 .suite","#ch2 .suite"], {opacity:0, y:20});
+  const sortie = id=>[[lignes(id),{yPercent:-110,stagger:.03,duration:.5}],[suites(id),{opacity:0,y:-20,duration:.4}]];
+  const entree = id=>[[lignes(id),{yPercent:0,stagger:.05,duration:.6}],[suites(id),{opacity:1,y:0,duration:.5}]];
+  const tl = gsap.timeline({defaults:{ease:"power2.inOut"}, scrollTrigger:{trigger:"#recit",start:"top top",end:"bottom bottom",scrub:1.1}});
+  tl.addLabel("c1", .5);
+  sortie("ch0").forEach(([t,v])=>tl.to(t,v,"c1"));
+  tl.to("#defile",{opacity:0,duration:.3},"c1")
+    .to(S,{orb:m?.35:-.55, tx:m?0:-1.35, ty:m?.75:.05, rotY:Math.PI*.85, rotX:-.1, rayon:m?7.6:6.4, duration:1.4},"c1");
+  entree("ch1").forEach(([t,v])=>tl.to(t,v,"c1+=.7"));
+  tl.addLabel("c2", "c1+=2.2");
+  sortie("ch1").forEach(([t,v])=>tl.to(t,v,"c2"));
+  tl.to(S,{orb:m?0:.25, tx:m?0:1.2, ty:m?-.62:-.1, rotY:Math.PI*2, rotX:.12, spin:0, rayon:m?6.8:5.9, haut:.35, ech:m?.6:1, duration:1},"c2")
+    .to(S,{coupeE:.02, duration:.9},"c2+=.6")
+    .to(S,{coupeD:.12, duration:.8},"c2+=.95")
+    .to(S,{etiq:1, duration:.5},"c2+=1.3");
+  entree("ch2").forEach(([t,v])=>tl.to(t,v,"c2+=.5"));
+  tl.to({}, {duration:2.6});
+  // les soins glissent par-dessus : la scène recule, puis on arrête de la calculer
+  gsap.timeline({scrollTrigger:{trigger:"#soins",start:"top bottom",end:"top top",scrub:1}}).to(S,{rayon:11, ech:.7, etiq:0});
+  ScrollTrigger.create({trigger:"#soins",start:"top top",onEnter:()=>visible=false,onLeaveBack:()=>{visible=true;boucle();}});
+}
+
+if (!matchMedia("(pointer: coarse)").matches) addEventListener("mousemove",e=>{ souris.x=e.clientX/innerWidth*2-1; souris.y=-(e.clientY/innerHeight*2-1); });
+addEventListener("resize",()=>{ const w=innerWidth,h=innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); composer.setSize(w,h); bloom.resolution.set(w,h); });
+
+const ancres = {
+  email:{p:new THREE.Vector3(-.55,.55,.05), el:document.querySelector('[data-a="email"]'), d:0},
+  dentine:{p:new THREE.Vector3(-.3,.2,.08), el:document.querySelector('[data-a="dentine"]'), d:.25},
+  pulpe:{p:new THREE.Vector3(-.12,-.45,.05), el:document.querySelector('[data-a="pulpe"]'), d:.5}
+};
+const v = new THREE.Vector3();
+function placerEtiquettes(){
+  for (const k in ancres){
+    const a = ancres[k];
+    v.copy(a.p); stage.localToWorld(v); v.project(camera);
+    const x = (v.x*.5+.5)*innerWidth, y = (-v.y*.5+.5)*innerHeight;
+    a.el.style.opacity = Math.max(0, Math.min(1, (L.etiq-a.d)/(1-a.d+.0001)*1.6));
+    a.el.style.transform = `translate(${x - a.el.offsetWidth}px, ${y - a.el.offsetHeight/2}px)`;
   }
-  const m = mobile();
-  // chapitre 2 : la dent passe à gauche, tourne d'un demi-tour, la caméra s'approche
-  gsap.timeline({scrollTrigger:{trigger:"#ch2",start:"top bottom",end:"top top",scrub:1}})
-    .to(st.x,{t:m?0:-1.25},0).to(st.y,{t:m?.8:0},0).to(st.rotY,{t:Math.PI*.9},0)
-    .to(st.rotX,{t:-.15},0).to(st.camZ,{t:m?8:6.2},0);
-  // chapitre 3 : retour à droite, vue par-dessus (on voit les cuspides)
-  gsap.timeline({scrollTrigger:{trigger:"#ch3",start:"top bottom",end:"top top",scrub:1}})
-    .to(st.x,{t:m?0:1.3},0).to(st.y,{t:m?.8:.05},0).to(st.rotY,{t:Math.PI*1.9},0)
-    .to(st.rotX,{t:.85},0).to(st.camZ,{t:m?8:6},0);
-  // le papier monte : la dent recule et s'efface
-  gsap.timeline({scrollTrigger:{trigger:"#papier",start:"top bottom",end:"top top",scrub:1}})
-    .to(st.camZ,{t:10},0).to(st.ech,{t:.6},0).to(st.rotY,{t:Math.PI*2.6},0);
-  // en-tête passe en clair au-dessus du papier
-  ScrollTrigger.create({trigger:"#papier",start:"top 60px",onToggle:s=>document.getElementById("entete").classList.toggle("clair",s.isActive)});
-  // apparition des titres de chapitres
-  gsap.utils.toArray(".chapitre h2").forEach(h=>{
-    gsap.from(h,{yPercent:40,opacity:0,ease:"power3.out",duration:1.1,scrollTrigger:{trigger:h,start:"top 85%"}});
+}
+
+const horloge = new THREE.Clock();
+let spinAcc = 0, enCours = false;
+function boucle(){
+  if (enCours) return; enCours = true;
+  requestAnimationFrame(function f(){
+    if (!visible || document.hidden){ enCours = false; return; }
+    const dt = Math.min(horloge.getDelta(),.1), t = horloge.elapsedTime;
+    const k = 1-Math.pow(1-.08, dt*60);
+    for (const c in S) L[c] += (S[c]-L[c])*k;
+    souris.lx += (souris.x-souris.lx)*.08; souris.ly += (souris.y-souris.ly)*.08;
+    if (!reduit) spinAcc += dt*.12*L.spin;
+    const ang = L.orb + souris.lx*.08;
+    camera.position.set(Math.sin(ang)*L.rayon, L.haut + souris.ly*.12, Math.cos(ang)*L.rayon);
+    camera.lookAt(0,0,0);
+    stage.position.set(L.tx, L.ty + (reduit?0:Math.sin(t*.7)*.04*L.spin), 0);
+    stage.rotation.set(L.rotX, L.rotY + spinAcc, .08);
+    stage.scale.setScalar(L.ech);
+    const centre = stage.getWorldPosition(new THREE.Vector3());
+    const versCam = camera.position.clone().sub(centre).normalize();
+    coupeEmail.normal.copy(versCam).negate(); coupeEmail.constant = centre.dot(versCam) + L.coupeE;
+    coupeDentine.normal.copy(versCam).negate(); coupeDentine.constant = centre.dot(versCam) + L.coupeD;
+    decor.position.set(-Math.sin(ang)*5, .2, -Math.cos(ang)*5); decor.lookAt(camera.position);
+    placerEtiquettes();
+    grain.uniforms.uTime.value = t;
+    composer.render();
+    requestAnimationFrame(f);
   });
 }
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ horloge.getDelta(); boucle(); } });
 
-if (!matchMedia("(pointer: coarse)").matches) {
-  addEventListener("mousemove",e=>{ st.mx.t=e.clientX/innerWidth*2-1; st.my.t=-(e.clientY/innerHeight*2-1); });
-}
-
-/* ── redimensionnement ── */
-addEventListener("resize",()=>{
-  const w=innerWidth,h=innerHeight;
-  camera.aspect=w/h; camera.updateProjectionMatrix();
-  renderer.setSize(w,h); composer.setSize(w,h); bloom.resolution.set(w,h);
-  if (scrollY < innerHeight*.5) poseDepart();
-});
-
-/* ── boucle ── */
-const horloge = new THREE.Clock();
-let actif = true;
-document.addEventListener("visibilitychange",()=>{ actif=!document.hidden; if(actif){horloge.getDelta(); boucle();} });
-function boucle(){
-  if(!actif) return;
-  const dt = Math.min(horloge.getDelta(),.1), t = horloge.elapsedTime;
-  for (const k in st) damp(st[k], dt, k[0]==="m"?.12:.07);
-  camera.position.set(st.mx.c*.22, .15+st.my.c*.15, st.camZ.c);
-  camera.lookAt(0,0,0);
-  stage.position.set(st.x.c, st.y.c + (reduit?0:Math.sin(t*.7)*.05), 0);
-  stage.rotation.set(st.rotX.c, st.rotY.c + (reduit?0:t*.12), .1);
-  stage.scale.setScalar(st.ech.c);
-  halo.position.x = st.x.c*.6; halo.position.y = st.y.c*.6;
-  halo.material.uniforms.uT.value = t;
-  grain.uniforms.uTime.value = t;
-  composer.render();
-  requestAnimationFrame(boucle);
-}
-
-/* ── préchargeur puis entrée ── */
-let fini = false;
+let lance = false;
 manager.onProgress = (u,l,tot)=>{ const p=Math.round(l/tot*100); compteur.textContent=p; barre.style.width=p+"%"; };
-function entree(){
-  if (fini) return; fini = true;
-  // compteur qui file jusqu'à 100, puis le rideau tombe
-  const o = {v: +compteur.textContent || 0};
-  gsap ? gsap.to(o,{v:100,duration:.9,ease:"power2.inOut",onUpdate:()=>{compteur.textContent=Math.round(o.v);barre.style.width=o.v+"%";},onComplete:lancer}) : lancer();
+function entreeScene(){
+  if (lance) return; lance = true;
+  if (!gsap) { pre.classList.add("fini"); return; }
+  const o = {v:+compteur.textContent||0};
+  gsap.to(o,{v:100,duration:.9,ease:"power2.inOut",onUpdate:()=>{compteur.textContent=Math.round(o.v);barre.style.width=o.v+"%";},onComplete:()=>{
+    pre.classList.add("fini");
+    ScrollTrigger.refresh();
+    if (reduit) return;
+    L.rayon = 15; L.rotY = -Math.PI*1.6;
+    gsap.timeline({defaults:{ease:"expo.out"}})
+      .from("#ch0 .ligne > span",{yPercent:110,duration:1.3,stagger:.09},.4)
+      .from("#ch0 .reperes, header, #defile",{opacity:0,duration:1},1);
+  }});
 }
-function lancer(){
-  pre.classList.add("fini");
-  if (!gsap || reduit) return;
-  const tl = gsap.timeline({defaults:{ease:"expo.out"}});
-  tl.from(st.camZ,{c:16,t:16,duration:2.4},0)
-    .from(st.rotY,{c:-Math.PI*1.6,t:-Math.PI*1.6,duration:2.6},0)
-    .from(".chapitre h1 .ligne > span",{yPercent:110,duration:1.3,stagger:.09},.35)
-    .from(".reperes",{opacity:0,duration:1},.9)
-    .from("header",{opacity:0,duration:1},.9);
-}
-// la dent est prête quand le chargeur a fini (glb trouvé ou repli intégré)
-const attente = setInterval(()=>{ if(dent){ clearInterval(attente); entree(); } }, 60);
-setTimeout(()=>{ if(!dent){ charge(dentIntegree()); } }, 2500);
-
+const attente = setInterval(()=>{ if(dent){ clearInterval(attente); entreeScene(); } }, 60);
+setTimeout(()=>{ if(!dent){ dent = dentIntegree(); stage.add(dent); } }, 2500);
 boucle();
 }
 </script>
