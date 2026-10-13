@@ -158,7 +158,7 @@ main{position:relative;z-index:1}
    datamosh (Codrops 2 sept. 2026), Why Zero (Site du mois, sept. 2026) */
 .carte-soins{height:100vh;height:100svh;overflow:hidden;position:relative}
 .cs-gl{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.cs-grille{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(24px,4vw,70px);padding:clamp(96px,13vh,130px) var(--g) clamp(92px,13vh,120px)}
+.cs-grille{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(0,3.6fr) minmax(0,8.4fr);gap:clamp(32px,6vw,110px);padding:clamp(96px,13vh,130px) var(--g) clamp(92px,13vh,120px)}
 .cs-gauche{display:flex;flex-direction:column;justify-content:space-between;min-height:0}
 .cs-tete h2{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(1.7rem,2.6vw,2.8rem);line-height:1;letter-spacing:-.02em}
 .cs-tete p{margin-top:14px;max-width:28ch;color:var(--encre-douce);font-size:clamp(.95rem,1.05vw,1.05rem)}
@@ -194,8 +194,8 @@ main{position:relative;z-index:1}
 .cs-jauge{height:2px;background:var(--trait)}
 .cs-jauge i{display:block;height:100%;background:var(--encre);transform-origin:left;transform:scaleX(0)}
 /* le nom du soin traverse l'écran et inverse l'image */
-.cs-geant{position:absolute;z-index:3;left:0;right:auto;bottom:0;pointer-events:none;mix-blend-mode:difference;color:#EDF0EE;
-  font-family:var(--serif);font-weight:400;font-variation-settings:"opsz" 96;font-size:clamp(3.2rem,9.4vw,11.5rem);line-height:.86;letter-spacing:-.045em;text-align:right}
+.cs-geant{position:relative;z-index:2;color:var(--encre);pointer-events:none;font-family:var(--serif);font-weight:400;font-variation-settings:"opsz" 96;
+  font-size:clamp(2.4rem,min(4.8vw,8.4vh),5.6rem);line-height:.95;letter-spacing:-.04em;white-space:nowrap;min-height:1.1em}
 .cs-geant .mot{display:inline-block;white-space:nowrap}
 .cs-geant .l{display:inline-block;will-change:transform}
 .cs-geant .rang{display:block;overflow:hidden;padding:.06em 0 .04em}
@@ -206,6 +206,7 @@ main{position:relative;z-index:1}
   .cs-tete{order:0}.cs-droite{order:1}.cs-liste{order:2}
   .cs-liste button{padding:6px 0;font-size:1.05rem}
   .cs-cadre{flex:1}
+  .cs-geant{font-size:9.2vw}
 
 }
 /* ─── 3. vertical : la phrase qui se remplit ─── */
@@ -370,6 +371,7 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
         </ul>
       </div>
       <div class="cs-droite">
+        <div class="cs-geant" id="cs-geant" aria-hidden="true"></div>
         <div class="cs-cadre">
           <figure class="cs-img" data-i="0"><img src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1100&q=75" alt="Examen dentaire au miroir" loading="lazy"></figure>
           <figure class="cs-img" data-i="1"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1100&q=75" alt="Dentiste qui lit des radiographies" loading="lazy"></figure>
@@ -390,7 +392,6 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
         <div class="cs-jauge" aria-hidden="true"><i></i></div>
       </div>
     </div>
-    <div class="cs-geant" id="cs-geant" aria-hidden="true"></div>
   </section>
 
   <!-- 3. vertical, la phrase qui se remplit -->
@@ -1083,51 +1084,82 @@ import * as THREE from "three";
   document.fonts && document.fonts.ready.then(()=>{ const k=sources.indexOf(null); if(k>=0){ tex[k]=panneauUrgence(); } });
 
   const mat=new THREE.ShaderMaterial({
+    premultipliedAlpha:true, blending:THREE.CustomBlending, blendSrc:THREE.OneFactor, blendDst:THREE.OneMinusSrcAlphaFactor,
     uniforms:{uA:{value:null},uB:{value:null},uMix:{value:0},uVel:{value:0},uT:{value:0},uLens:{value:0},uMouse:{value:new THREE.Vector2(.5,.5)},
-      uAspA:{value:1},uAspB:{value:1},uPlane:{value:1},uW:{value:1},uH:{value:1},uCurve:{value:.09}},
+      uAspA:{value:1},uAspB:{value:1},uPlane:{value:1},uW:{value:1},uH:{value:1},uCurve:{value:.045},uMode:{value:1},uEntree:{value:0}},
+    transparent:true,
     vertexShader:`uniform float uVel,uMix,uW,uH,uCurve,uT;varying vec2 vUv;
       void main(){vUv=uv;vec3 p=position;float xn=p.x/uW*2.,yn=p.y/uH*2.;
         p.z+=xn*xn*uCurve*uW;
-        p.z+=sin(yn*1.5708)*uVel*uH*.16;
-        p.z+=sin(3.14159*uMix)*(1.-yn*yn)*uH*.07;
-        p.y+=sin(xn*3.+uT)*uVel*uH*.02;
+        p.z+=sin(yn*1.5708)*uVel*uH*.05;
+        p.z+=sin(3.14159*uMix)*(1.-yn*yn)*uH*.025;
+        
         gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}`,
     fragmentShader:`precision highp float;
-      uniform sampler2D uA,uB;uniform float uMix,uVel,uT,uLens,uAspA,uAspB,uPlane;uniform vec2 uMouse;varying vec2 vUv;
+      uniform sampler2D uA,uB;uniform float uMix,uVel,uT,uLens,uAspA,uAspB,uPlane,uMode,uEntree;uniform vec2 uMouse;varying vec2 vUv;
+      const vec3 ROSE=vec3(.89,.61,.61);const vec3 BLANC=vec3(.97,.98,.97);
       float h(float x){return fract(sin(x*127.1)*43758.5453);}
       float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1,1)),f.x),f.y);}
       vec2 cover(vec2 uv,float pa,float ia){vec2 s=pa>ia?vec2(1.,ia/pa):vec2(pa/ia,1.);return (uv-.5)*s+.5;}
       vec3 lit(sampler2D t,vec2 uv,float a,float sp){uv=cover(uv,uPlane,a);
         vec3 c=vec3(texture2D(t,uv+vec2(sp,0.)).r,texture2D(t,uv).g,texture2D(t,uv-vec2(sp,0.)).b);
-        float g=dot(c,vec3(.299,.587,.114));c=mix(vec3(g),c,.78);c=(c-.5)*1.16+.5;return c;}
+        float g=dot(c,vec3(.299,.587,.114));c=mix(vec3(g),c,.82);c=(c-.5)*1.12+.5;return c;}
+      // 0. nettoyage : une raclette en diagonale, avec un reflet qui brille sur le front
+      float mNettoyage(vec2 uv,float p,out float e){float d=uv.x*.72+(1.-uv.y)*.28;float f=p*1.3-.15;e=exp(-pow((d-f)/.022,2.));return smoothstep(f+.008,f-.008,d);}
+      // 1. canal : trois canaux descendent comme des racines, puis s'élargissent
+      float mCanal(vec2 uv,float p,out float e){float m=0.;e=0.;
+        for(int i=0;i<3;i++){float fi=float(i);float cx=.27+fi*.23+sin(uv.y*7.+fi*2.)*.012;
+          float chute=clamp((p-fi*.1)*2.3,0.,1.);float yF=1.-chute*1.04;
+          float w=mix(.022,1.25,smoothstep(.42,1.,p))*mix(1.,.38,1.-uv.y);
+          float dans=step(abs(uv.x-cx),w*.5)*step(yF,uv.y);m=max(m,dans);
+          float bordC=(1.-smoothstep(0.,.005,abs(abs(uv.x-cx)-w*.5)))*step(yF,uv.y);
+          float pointe=(1.-smoothstep(0.,.012,length((uv-vec2(cx,yF))*vec2(uPlane,1.))))*step(.001,chute)*step(chute,.999);
+          e=max(e,max(bordC,pointe));}
+        e*=step(p,.995);return max(m,step(.995,p));}
+      // 2. enfants : des bulles qui gonflent et éclatent une à une
+      float mBulles(vec2 uv,float p,out float e){vec2 g=uv*vec2(uPlane*2.6,2.6);vec2 id=floor(g),f=fract(g);float m=0.;e=0.;
+        for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 o=vec2(float(x),float(y));vec2 ci=id+o;
+          vec2 c=o+.5+(vec2(h2(ci+3.1),h2(ci+7.7))-.5)*.55;float r=clamp((p-h2(ci)*.55)/.42,0.,1.);r=r*r*(3.-2.*r)*1.2;
+          vec2 dv=f-c;float d=length(dv)+sin(atan(dv.y,dv.x)*5.+uT*3.)*.012*r;
+          m=max(m,step(d,r));e=max(e,(1.-smoothstep(0.,.035,abs(d-r)))*step(.02,r)*step(r,1.15));}
+        e*=step(p,.995);return max(m,step(.995,p));}
+      // 3. prix : l'image s'imprime ligne par ligne, comme un reçu clair
+      float mRecu(vec2 uv,float p,out float e){float rangs=18.;float r=floor((1.-uv.y)*rangs);float x=clamp(p*(rangs+2.)-r,0.,1.);
+        e=(1.-smoothstep(0.,.005,abs(uv.x-x)))*step(.001,x)*step(x,.999);
+        float trait=step(.94,fract((1.-uv.y)*rangs))*step(.5,fract(uv.x*60.))*step(.001,x)*step(x,.999)*.5;e=max(e,trait);return step(uv.x,x);}
       void main(){
         vec2 uv=vUv;
-        // lentille carrée qui suit le curseur (grossit et sépare les couleurs)
-        vec2 d=(uv-uMouse)*vec2(uPlane,1.);float m=max(abs(d.x),abs(d.y));
-        float inL=uLens*(1.-smoothstep(.105,.11,m));
-        uv=mix(uv,uMouse+(uv-uMouse)*.55,inL);
-        // fonte en colonnes : chaque colonne tombe à sa vitesse, l'image suivante descend du haut
-        float cols=34.;float c=floor(vUv.x*cols);float r=h(c+1.);
-        float loc=clamp(uMix*1.75-r*.75,0.,1.);loc=loc*loc*(3.-2.*loc);
-        float k=1.+r*.55;
-        float mid=sin(3.14159*uMix);
-        float ond=(n2(vec2(c*.37,uT*.6))-.5)*.05*mid;
-        float sp=.003+mid*.018*(.4+r)+abs(uVel)*.02+inL*.014;
-        vec2 uvA=uv+vec2(ond,-loc*k);
-        vec2 uvB=uv+vec2(ond,(1.-loc)*k);
-        vec3 col;
-        if(uvB.y<=1.) col=lit(uB,uvB,uAspB,sp);
-        else if(uvA.y>=0.) col=lit(uA,uvA,uAspA,sp);
-        else col=lit(uB,vec2(uv.x,.995),uAspB,sp)*.85;
-        // filet rose sur le front de l'image qui arrive
-        float front=1.-(1.-loc)*k;float f=1.-smoothstep(0.,.004,abs(uv.y-front));
-        col=mix(col,vec3(.89,.61,.61),f*step(.001,uMix)*step(uMix,.999));
-        // cadre de la lentille
-        float bord=(1.-smoothstep(.0,.0025,abs(m-.108)))*uLens;col=mix(col,vec3(.93,.94,.93),bord);
-        // grain
-        col+=(h2(vUv*1000.+uT)-.5)*.045;
-        gl_FragColor=vec4(col,1.);}`
+        vec2 d=(uv-uMouse)*vec2(uPlane,1.);float lm=max(abs(d.x),abs(d.y));
+        float inL=uLens*(1.-smoothstep(.105,.11,lm));
+        uv=mix(uv,uMouse+(uv-uMouse)*.6,inL);
+        float sp=.0015+abs(uVel)*.008+inL*.01;
+        vec3 col;float e=0.;vec3 teinte=ROSE;
+        if(uMode>3.5){
+          // 4. urgence : l'image fond en colonnes, avec un flash rose
+          float cols=34.;float c=floor(vUv.x*cols);float r=h(c+1.);
+          float loc=clamp(uMix*1.75-r*.75,0.,1.);loc=loc*loc*(3.-2.*loc);float k=1.+r*.55;float mid=sin(3.14159*uMix);
+          float ond=(n2(vec2(c*.37,uT*.6))-.5)*.05*mid;float spu=sp+mid*.02*(.4+r);
+          vec2 uvA=uv+vec2(ond,-loc*k),uvB=uv+vec2(ond,(1.-loc)*k);
+          if(uvB.y<=1.) col=lit(uB,uvB,uAspB,spu); else if(uvA.y>=0.) col=lit(uA,uvA,uAspA,spu); else col=lit(uB,vec2(uv.x,.995),uAspB,spu)*.85;
+          float front=1.-(1.-loc)*k;e=1.-smoothstep(0.,.004,abs(uv.y-front));e*=step(.001,uMix)*step(uMix,.999);
+          col+=ROSE*mid*.18*(.5+.5*sin(uT*14.));
+        } else {
+          float m;vec2 uvA=uv;
+          if(uMode<.5){ m=mNettoyage(uv,uMix,e);teinte=BLANC;uvA.x+=e*.03; }
+          else if(uMode<1.5){ m=mCanal(uv,uMix,e); }
+          else if(uMode<2.5){ m=mBulles(uv,uMix,e);teinte=BLANC; }
+          else { m=mRecu(uv,uMix,e); }
+          col=mix(lit(uA,uvA,uAspA,sp),lit(uB,uv,uAspB,sp),m);
+        }
+        col=mix(col,teinte,clamp(e,0.,1.)*.9);
+        // entrée de la section : la première image apparaît d'un coup de raclette
+        float eE;float mE=mNettoyage(vUv,uEntree,eE);
+        col=mix(col,BLANC,eE*.9*step(uEntree,.999));
+        float bord=(1.-smoothstep(.0,.0025,abs(lm-.108)))*uLens;col=mix(col,vec3(.93,.94,.93),bord);
+        col+=(h2(vUv*1000.+uT)-.5)*.035;
+        float alpha=max(mE,eE*step(uEntree,.999));
+        gl_FragColor=vec4(col*alpha,alpha);}`
   });
   const plan=new THREE.Mesh(new THREE.PlaneGeometry(1,1,80,40),mat); scene.add(plan);
 
@@ -1140,12 +1172,8 @@ import * as THREE from "three";
     plan.geometry.dispose(); plan.geometry=new THREE.PlaneGeometry(w,hh,80,40);
     plan.position.set(cx-W/2, -(cy-H/2), 0);
     mat.uniforms.uW.value=w; mat.uniforms.uH.value=hh; mat.uniforms.uPlane.value=w/hh;
-    mat.uniforms.uCurve.value = W<760 ? .05 : .09;
+    mat.uniforms.uCurve.value = W<760 ? .025 : .045;
     // le nom du soin s'aligne sur le bord droit de l'écran et mord sur son bas
-    const geant=document.getElementById("cs-geant");
-    geant.style.width=(w*1.12)+"px"; geant.style.left=(R.right-S.left-w*1.12)+"px";
-    const fs=Math.min(w*.105, H*.15); geant.style.fontSize=fs+"px";
-    geant.style.bottom=(S.bottom-R.bottom + fs*.12)+"px";
   }
   addEventListener("resize",caler); caler(); document.fonts && document.fonts.ready.then(caler);
   if(window.ScrollTrigger) ScrollTrigger.addEventListener("refresh",caler);
@@ -1158,7 +1186,7 @@ import * as THREE from "three";
   }
 
   let vu=false; new IntersectionObserver(es=>{ vu=es[0].isIntersecting; if(vu) boucle(); },{rootMargin:"200px"}).observe(sec);
-  const etat=window.soinsEtat, horloge=new THREE.Clock(); let vel=0, enCours=false;
+  const etat=window.soinsEtat, horloge=new THREE.Clock(); let vel=0, enCours=false, entree=0, entreeT=0;
   function boucle(){
     if(enCours) return; enCours=true;
     requestAnimationFrame(function f(){
@@ -1167,6 +1195,8 @@ import * as THREE from "three";
       const p=Math.max(0,Math.min(etat.n-1,etat.p)), i=Math.min(etat.n-2,Math.floor(p)), fr=p-i;
       const mix = p>=etat.n-1 ? 1 : THREE.MathUtils.smoothstep(fr,.5,.95);
       const u=mat.uniforms;
+      u.uMode.value=i+1;
+      const Rs=sec.getBoundingClientRect(); entreeT=Math.max(0,Math.min(1,1.15-Rs.top/innerHeight*1.3)); entree+=(entreeT-entree)*.12; u.uEntree.value=entree;
       u.uA.value=tex[i]; u.uB.value=tex[i+1]; u.uAspA.value=asp[i]||1; u.uAspB.value=asp[i+1]||1; u.uMix.value=mix;
       vel+=(etat.vel-vel)*.08; u.uVel.value=vel; u.uT.value=t;
       souris.x+=(souris.tx-souris.x)*.18; souris.y+=(souris.ty-souris.y)*.18; souris.l+=(souris.tl-souris.l)*.12;
