@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Centre Dentaire Langelier</title>
+<meta name="description" content="Clinique dentaire familiale au 7335, boulevard Langelier, Saint-Léonard. Ouvert le soir jeudi et vendredi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --porcelaine:#EDF0EE;
+  --porcelaine-2:#E2E7E4;
+  --pin:#14251F;
+  --pin-doux:#4A5C55;
+  --gencive:#E7A9A8;
+  --gencive-fonce:#B9605F;
+  --blanc:#FBFCFB;
+  --gouttiere:clamp(16px,4vw,56px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--porcelaine);color:var(--pin);
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  font-variation-settings:"wdth" 100;
+  font-size:clamp(16px,1.05vw,18px);line-height:1.55;
+  overflow-x:hidden;
+}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gencive-fonce);outline-offset:3px;border-radius:4px}
+
+/* ---------- canvas 3D ---------- */
+#scene{position:fixed;inset:0;width:100vw;height:100vh;z-index:1;pointer-events:none}
+main,header,footer{position:relative;z-index:2}
+
+/* ---------- en-tête ---------- */
+header{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:22px var(--gouttiere);
+}
+.marque{font-weight:700;font-variation-settings:"wdth" 80;font-size:1.15rem;letter-spacing:-.01em;text-decoration:none;line-height:1.05}
+.marque span{display:block;font-weight:400;font-variation-settings:"wdth" 100;font-size:.82rem;color:var(--pin-doux);letter-spacing:0}
+nav{display:flex;gap:28px;align-items:center}
+nav a.lien{text-decoration:none;font-size:.95rem}
+nav a.lien:hover{text-decoration:underline;text-underline-offset:4px}
+.appel{
+  display:inline-flex;white-space:nowrap;align-items:center;gap:10px;
+  background:var(--pin);color:var(--blanc);text-decoration:none;
+  padding:12px 20px;border-radius:999px;font-weight:600;font-size:.95rem;
+  transition:background .2s;
+}
+.appel:hover{background:#21392F}
+@media (max-width:760px){nav a.lien{display:none}}
+
+/* ---------- héros ---------- */
+.heros{
+  min-height:calc(100svh - 84px);
+  display:grid;grid-template-rows:1fr auto;
+  padding:0 var(--gouttiere) 40px;
+}
+.heros h1{
+  align-self:end;
+  font-weight:760;font-variation-settings:"wdth" 75,"opsz" 96;
+  font-size:clamp(3.1rem,10.4vw,10.5rem);
+  line-height:.86;letter-spacing:-.035em;
+  max-width:11ch;
+}
+.heros h1 .ligne{display:block;overflow:hidden;padding-bottom:.04em}
+.heros h1 .ligne > span{display:block}
+.heros-bas{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;
+  margin-top:clamp(28px,5vh,56px);padding-top:20px;
+  border-top:1.5px solid var(--pin);
+  font-size:.98rem;
+}
+.heros-bas p strong{display:block;font-weight:650}
+.etat{display:inline-flex;align-items:center;gap:8px}
+.etat::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--pin-doux)}
+.etat.ouvert::before{background:#2E8B57;box-shadow:0 0 0 4px rgba(46,139,87,.18)}
+@media (max-width:760px){
+  .heros{min-height:auto;padding-top:46vh}
+  .heros-bas{grid-template-columns:1fr;gap:14px}
+}
+
+/* ---------- soins ---------- */
+.soins{
+  display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);
+  gap:var(--gouttiere);padding:clamp(90px,16vh,180px) var(--gouttiere);
+}
+.soins-intro{position:sticky;top:120px;align-self:start}
+.soins-intro h2,.avis h2,.visite h2{
+  font-weight:720;font-variation-settings:"wdth" 75,"opsz" 72;
+  font-size:clamp(2.2rem,4.6vw,4.4rem);line-height:.95;letter-spacing:-.025em;
+}
+.soins-intro p{margin-top:18px;max-width:34ch;color:var(--pin-doux)}
+.liste-soins{list-style:none;border-top:1.5px solid var(--pin)}
+.liste-soins li{
+  padding:30px 0 32px;border-bottom:1.5px solid var(--pin);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:baseline;
+}
+.liste-soins h3{
+  font-weight:650;font-variation-settings:"wdth" 82;
+  font-size:clamp(1.5rem,2.5vw,2.3rem);line-height:1.02;letter-spacing:-.015em;
+}
+.liste-soins p{color:var(--pin-doux);max-width:40ch}
+@media (max-width:900px){
+  .soins{grid-template-columns:1fr}
+  .soins-intro{position:static}
+  .liste-soins li{grid-template-columns:1fr;gap:8px}
+}
+
+/* ---------- avis ---------- */
+.avis{
+  padding:clamp(80px,14vh,160px) var(--gouttiere);
+  display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--gouttiere);
+}
+.note{font-size:clamp(1.15rem,1.6vw,1.4rem);margin-top:22px;max-width:30ch}
+.note a{text-underline-offset:4px}
+.echos{list-style:none;display:grid;gap:34px;align-content:start}
+.echos li{font-size:clamp(1.15rem,1.55vw,1.4rem);line-height:1.35;padding-left:22px;border-left:3px solid var(--gencive-fonce)}
+.echos small{display:block;margin-top:8px;font-size:.85rem;color:var(--pin-doux)}
+@media (max-width:900px){.avis{grid-template-columns:1fr}}
+
+/* ---------- visite (panneau gencive) ---------- */
+.visite{
+  background:var(--gencive);
+  margin:0 var(--gouttiere);
+  border-radius:clamp(22px,3vw,40px) clamp(22px,3vw,40px) 0 0;
+  padding:clamp(56px,9vw,120px) clamp(22px,5vw,80px);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(36px,6vw,90px);
+}
+.visite h2{max-width:10ch}
+.visite .appel{margin-top:30px;font-size:1.05rem;padding:16px 26px}
+.adresse{margin-top:30px;font-size:1.1rem;line-height:1.45}
+.adresse a{text-underline-offset:4px}
+table{width:100%;border-collapse:collapse;font-size:1.05rem}
+caption{text-align:left;font-weight:650;font-size:1.2rem;margin-bottom:12px}
+td{padding:12px 0;border-bottom:1.5px solid rgba(20,37,31,.28)}
+td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+tr.aujourdhui td{font-weight:700}
+tr.aujourdhui td:first-child::after{content:" (aujourd’hui)";font-weight:400}
+@media (max-width:900px){.visite{grid-template-columns:1fr}}
+
+footer{
+  background:var(--pin);color:var(--porcelaine-2);
+  padding:40px var(--gouttiere);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:.9rem;
+}
+.maquette{opacity:.7}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<canvas id="scene" aria-hidden="true"></canvas>
+
+<header>
+  <a class="marque" href="#">Centre Dentaire Langelier<span>Saint-Léonard</span></a>
+  <nav aria-label="Navigation principale">
+    <a class="lien" href="#soins">Soins</a>
+    <a class="lien" href="#avis">Avis</a>
+    <a class="lien" href="#visite">Horaires et adresse</a>
+    <a class="appel" href="tel:+15142555511">514 255-5511</a>
+  </nav>
+</header>
+
+<main>
+  <section class="heros">
+    <h1>
+      <span class="ligne"><span>Trois</span></span>
+      <span class="ligne"><span>générations</span></span>
+      <span class="ligne"><span>de sourires.</span></span>
+    </h1>
+    <div class="heros-bas">
+      <p><strong>Clinique familiale</strong>Des familles du quartier nous confient leurs dents depuis plus de 20 ans.</p>
+      <p><strong>7335, boulevard Langelier</strong>Saint-Léonard, Montréal</p>
+      <p><strong class="etat" id="etat">Horaires</strong><span id="etat-detail">Ouvert le soir jeudi et vendredi, jusqu’à 21 h.</span></p>
+    </div>
+  </section>
+
+  <section class="soins" id="soins">
+    <div class="soins-intro">
+      <h2>Ce qu’on fait pour vous</h2>
+      <p>Du premier rendez-vous de votre enfant au traitement plus complexe, tout se fait ici, avec la même équipe.</p>
+    </div>
+    <ul class="liste-soins">
+      <li><h3>Examens et nettoyage</h3><p>Le suivi régulier qui évite les mauvaises surprises. On vous explique ce qu’on voit, sans jargon.</p></li>
+      <li><h3>Traitements de canal</h3><p>Un geste précis et doux pour sauver une dent plutôt que l’extraire.</p></li>
+      <li><h3>Urgences</h3><p>Une dent cassée, une douleur soudaine&nbsp;: appelez-nous, on trouve une place rapidement.</p></li>
+      <li><h3>Soins pour enfants</h3><p>Des visites courtes et rassurantes, pour que vos enfants aient envie de revenir.</p></li>
+      <li><h3>Plans de traitement et assurances</h3><p>On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p></li>
+    </ul>
+  </section>
+
+  <section class="avis" id="avis">
+    <div>
+      <h2>Ce que nos patients racontent</h2>
+      <p class="note">Une note de 4,9 sur 5, selon 167 avis sur <a href="https://www.google.com/maps/place/?q=place_id:ChIJdRRziIgeyUwRzTTNTfoTSVg">Google</a>.</p>
+    </div>
+    <ul class="echos">
+      <li>Une main légère, même pendant un traitement de canal.<small>Ce qui revient dans les avis sur le Dr Luu</small></li>
+      <li>Des parents, leurs enfants et maintenant leurs petits-enfants, soignés par la même clinique.<small>Un patient depuis plus de 20 ans</small></li>
+      <li>Une réception qui démêle les assurances et annonce le prix avant de commencer.<small>Ce qui revient dans plusieurs avis</small></li>
+    </ul>
+  </section>
+
+  <section class="visite" id="visite">
+    <div>
+      <h2>Venez nous voir</h2>
+      <p class="adresse">7335, boulevard Langelier<br>Saint-Léonard (Québec) H1S 1V7<br><a href="https://www.google.com/maps/search/?api=1&query=7335+Boulevard+Langelier+Saint-L%C3%A9onard+QC">Voir l’itinéraire</a></p>
+      <a class="appel" href="tel:+15142555511">Appeler pour un rendez-vous</a>
+    </div>
+    <table>
+      <caption>Heures d’ouverture</caption>
+      <tbody id="horaires">
+        <tr data-j="1"><td>Lundi</td><td>10 h à 17 h</td></tr>
+        <tr data-j="2"><td>Mardi</td><td>10 h à 17 h</td></tr>
+        <tr data-j="3"><td>Mercredi</td><td>10 h à 17 h</td></tr>
+        <tr data-j="4"><td>Jeudi</td><td>10 h à 21 h</td></tr>
+        <tr data-j="5"><td>Vendredi</td><td>10 h à 21 h</td></tr>
+        <tr data-j="6"><td>Samedi</td><td>10 h à 17 h</td></tr>
+        <tr data-j="0"><td>Dimanche</td><td>Fermé</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<footer>
+  <span>Centre Dentaire Langelier, 7335, boulevard Langelier, Saint-Léonard</span>
+  <span class="maquette">Maquette proposée par Spiralia</span>
+</footer>
+
+<script>
+/* ---------- état ouvert / fermé ---------- */
+(function(){
+  const h = {0:null,1:[10,17],2:[10,17],3:[10,17],4:[10,21],5:[10,21],6:[10,17]};
+  const now = new Date(new Date().toLocaleString("en-US",{timeZone:"America/Toronto"}));
+  const j = now.getDay(), heure = now.getHours()+now.getMinutes()/60;
+  const row = document.querySelector('#horaires tr[data-j="'+j+'"]');
+  if(row) row.classList.add("aujourdhui");
+  const etat = document.getElementById("etat"), det = document.getElementById("etat-detail");
+  const p = h[j];
+  if(p && heure>=p[0] && heure<p[1]){
+    etat.textContent = "Ouvert maintenant"; etat.classList.add("ouvert");
+    det.textContent = "Jusqu’à "+p[1]+" h aujourd’hui.";
+  } else {
+    etat.textContent = "Fermé en ce moment";
+    let k=j, prochain=null;
+    for(let i=0;i<7;i++){ const d=(j+i)%7, q=h[d]; if(q && (i>0 || heure<q[0])){prochain=[i,q,d];break;} }
+    const noms=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+    if(prochain) det.textContent = "On ouvre "+(prochain[0]===0?"aujourd’hui":prochain[0]===1?"demain":noms[prochain[2]])+" à "+prochain[1][0]+" h.";
+  }
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+
+const gsap = window.gsap;
+const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canvas = document.getElementById("scene");
+
+let renderer;
+try{
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+}catch(e){ canvas.remove(); }
+
+if(renderer){
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(32,1,0.1,100);
+camera.position.set(0,0,9);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+
+const cle = new THREE.DirectionalLight(0xffffff,1.6); cle.position.set(3,5,4); scene.add(cle);
+const contre = new THREE.DirectionalLight(0xffd9d6,1.1); contre.position.set(-4,-2,-3); scene.add(contre);
+
+/* ----- molaire procédurale ----- */
+const smooth = (a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t);};
+
+function couronne(){
+  let g = new THREE.SphereGeometry(1,180,140);
+  g.deleteAttribute("uv"); g.deleteAttribute("normal");
+  g = mergeVertices(g);
+  const p = g.attributes.position, v = new THREE.Vector3();
+  const cuspides = [[.42,.40],[-.42,.40],[.42,-.40],[-.42,-.40],[0,.05]];
+  for(let i=0;i<p.count;i++){
+    v.fromBufferAttribute(p,i);
+    let {x,y,z} = v;
+    const a = Math.atan2(z,x);
+    const n = 3.2;
+    const se = 1/Math.pow(Math.pow(Math.abs(Math.cos(a)),n)+Math.pow(Math.abs(Math.sin(a)),n),1/n);
+    let r = Math.hypot(x,z)*(0.82+0.18*se)*1.05;
+    r *= 1 + 0.035*Math.exp(-Math.pow((y-0.1)/0.5,2));
+    r *= 1 - 0.42*smooth(-0.1,-0.98,y);
+    let ny = y*0.82;
+    const nx = Math.cos(a)*r, nz = Math.sin(a)*r;
+    const haut = smooth(0.25,0.8,y);
+    if(haut>0){
+      let bosse = 0;
+      for(const c of cuspides){
+        const d2 = (nx-c[0])**2 + (nz-c[1])**2;
+        bosse += (c[0]===0?0.10:0.24)*Math.exp(-d2/0.075);
+      }
+      const sillon = 0.07*Math.exp(-(nx*nx)/0.006) + 0.05*Math.exp(-(nz*nz)/0.006);
+      ny = 0.18 + (ny-0.18)*0.35 + (bosse - sillon)*haut;
+    }
+    p.setXYZ(i,nx,ny,nz);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
+function racine(signe){
+  let g = new THREE.CylinderGeometry(0.36,0.06,1.9,64,60,true);
+  g.deleteAttribute("uv"); g.deleteAttribute("normal");
+  g = mergeVertices(g);
+  const p = g.attributes.position, v = new THREE.Vector3();
+  for(let i=0;i<p.count;i++){
+    v.fromBufferAttribute(p,i);
+    const t = (0.95 - v.y)/1.9; // 0 en haut, 1 à la pointe
+    const r = Math.hypot(v.x,v.z), a = Math.atan2(v.z,v.x);
+    const rr = r * (1 - 0.15*t) * (1 + 0.06*Math.sin(a*2));
+    p.setXYZ(i,
+      Math.cos(a)*rr*1.15 + signe*0.18*Math.sin(t*Math.PI*0.75) - signe*0.10*t*t,
+      v.y,
+      Math.sin(a)*rr*0.8);
+  }
+  g.computeVertexNormals();
+  g.translate(signe*0.36,-1.45,0);
+  return g;
+}
+
+const email = new THREE.MeshPhysicalMaterial({
+  color:0xF6F3EC, roughness:0.2, metalness:0,
+  clearcoat:1, clearcoatRoughness:0.08,
+  sheen:0.7, sheenColor:new THREE.Color(0xD6E6F2), sheenRoughness:0.4,
+  iridescence:0.18, iridescenceIOR:1.3,
+  thickness:0.6, specularIntensity:0.9
+});
+const racineMat = email.clone(); racineMat.color = new THREE.Color(0xEFE3D2); racineMat.roughness = 0.38;
+
+const dent = new THREE.Group();
+dent.add(new THREE.Mesh(couronne(),email));
+dent.add(new THREE.Mesh(racine(1),racineMat));
+dent.add(new THREE.Mesh(racine(-1),racineMat));
+const pivot = new THREE.Group(); pivot.add(dent); scene.add(pivot);
+dent.position.y = 0.45;
+
+/* ----- disposition selon la largeur ----- */
+const etat = {x:0,y:0,s:1,rx:0.35,ry:-0.6,rz:0.12};
+function base(){
+  const w = innerWidth;
+  return w<760 ? {x:0,y:1.55,s:0.62} : {x:1.85,y:0.25,s:1.05};
+}
+function taille(){
+  const w=innerWidth,h=innerHeight;
+  renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+  const b = base(); etat.x=b.x; etat.y=b.y; etat.s=b.s;
+}
+addEventListener("resize",taille); taille();
+
+/* ----- défilement et animations ----- */
+let souris = {x:0,y:0};
+addEventListener("pointermove",e=>{souris.x=e.clientX/innerWidth-.5;souris.y=e.clientY/innerHeight-.5;});
+
+if(!reduit && window.gsap){
+  gsap.registerPlugin(ScrollTrigger);
+  if(window.Lenis){
+    const lenis = new Lenis({lerp:0.09});
+    lenis.on("scroll",ScrollTrigger.update);
+    gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
+    document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{
+      const id=a.getAttribute("href"); if(id.length>1){e.preventDefault();lenis.scrollTo(id,{offset:-20});}
+    }));
+  }
+  /* entrée unique : la dent monte, les lignes se dévoilent */
+  const intro = gsap.timeline({defaults:{ease:"expo.out"}});
+  intro.from(".heros h1 .ligne > span",{yPercent:110,duration:1.3,stagger:.09})
+       .from(pivot.position,{y:-6,duration:1.8},0)
+       .from(pivot.rotation,{y:-Math.PI*1.4,duration:2.2},0)
+       .from(".heros-bas",{opacity:0,duration:1},.6);
+
+  const mobile = innerWidth<760;
+  if(mobile){
+    gsap.to(etat,{s:0.2,y:4,ry:Math.PI*1.2,scrollTrigger:{trigger:".heros",start:"top top",end:"center top",scrub:1}});
+    gsap.to("#scene",{opacity:0,scrollTrigger:{trigger:".heros",start:"top top",end:"center top",scrub:true}});
+  } else {
+    gsap.timeline({scrollTrigger:{trigger:".soins",start:"top bottom",end:"top 20%",scrub:1.2}})
+      .to(etat,{x:-3.35,y:-1.15,s:0.72,ry:Math.PI*1.1,rx:-0.2,rz:-0.15});
+    gsap.timeline({scrollTrigger:{trigger:".soins",start:"top 20%",end:"bottom 60%",scrub:1.2}})
+      .to(etat,{ry:Math.PI*2.2,rx:0.5});
+    gsap.timeline({scrollTrigger:{trigger:".avis",start:"top 85%",end:"top 35%",scrub:1}})
+      .to(etat,{s:0,y:-3.5,ry:Math.PI*2.8});
+  }
+}
+
+const horloge = new THREE.Clock();
+function boucle(){
+  const t = horloge.getElapsedTime();
+  pivot.position.x += (etat.x - pivot.position.x)*0.08;
+  if(!gsap || !gsap.isTweening(pivot.position)) pivot.position.y += (etat.y + Math.sin(t*0.9)*0.06 - pivot.position.y)*0.08;
+  pivot.scale.setScalar(pivot.scale.x + (etat.s - pivot.scale.x)*0.08);
+  dent.rotation.x = etat.rx + souris.y*0.25;
+  dent.rotation.y = etat.ry + (reduit?0:t*0.12) + souris.x*0.4;
+  dent.rotation.z = etat.rz;
+  renderer.render(scene,camera);
+  requestAnimationFrame(boucle);
+}
+pivot.scale.setScalar(etat.s); pivot.position.set(etat.x,etat.y,0);
+boucle();
+}
+</script>
+</body>
+</html>
