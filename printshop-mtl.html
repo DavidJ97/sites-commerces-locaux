@@ -1,0 +1,984 @@
+<!doctype html>
+<!--
+  Printshop MTL — maquette Spiralia (bon à tirer v.01)
+  Concept : la page est une épreuve d'impression. La feuille d'accueil s'imprime en quatre passes
+  (cyan 15°, magenta 75°, jaune 0°, noir 45°), les plaques se mettent en repérage au défilement,
+  un compte-fils suit le curseur et grossit la trame.
+  Pile reprise de dentaire-langelier.html : Three.js r170 + GSAP 3.12.5 + Lenis 1.1
+  Polices : Anybody, Martian Mono (Google Fonts, OFL) et Switzer (Fontshare)
+  Visuels du catalogue : images publiques de printshopmtl.com, à remplacer par de vraies photos d'atelier.
+-->
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Printshop MTL — Imprimerie à Montréal</title>
+<meta name="description" content="Imprimerie à Montréal : t-shirts, hoodies, autocollants, enseignes, bannières et papier peint. Commande en ligne ou sur soumission.">
+<meta name="theme-color" content="#151413">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_CA">
+<meta property="og:title" content="Printshop MTL — Imprimé à Montréal">
+<meta property="og:description" content="Vêtements, autocollants, enseignes, papier peint. De la pièce unique à la commande d’équipe.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23151413'/%3E%3Ccircle cx='13' cy='14' r='7' fill='%2300AEEF'/%3E%3Ccircle cx='19' cy='14' r='7' fill='%23EC008C' fill-opacity='.85'/%3E%3Ccircle cx='16' cy='19' r='7' fill='%23FFF200' fill-opacity='.8'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LocalBusiness","name":"Printshop MTL","url":"https://printshopmtl.com/",
+ "address":{"@type":"PostalAddress","addressLocality":"Montréal","addressRegion":"QC","addressCountry":"CA"},
+ "currenciesAccepted":"CAD, USD","paymentAccepted":"Visa, Mastercard, American Express, Apple Pay, Google Pay, PayPal, Shop Pay",
+ "availableLanguage":["fr","en"]}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Martian+Mono:wdth,wght@75..112.5,300..600&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nuit:#151413;
+  --papier:#F2EFE8;
+  --encre:#121211;
+  --douce:#5E5A53;
+  --brume:#A9A39A;
+  --trait:rgba(18,18,17,.16);
+  --cyan:#00AEEF;
+  --magenta:#EC008C;
+  --mag-fonce:#B8006D;
+  --jaune:#FFF200;
+  --g:clamp(18px,3.6vw,56px);
+  --large:"Anybody",system-ui,sans-serif;
+  --mono:"Martian Mono",ui-monospace,monospace;
+  --sans:"Switzer",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overscroll-behavior:none;background:var(--nuit)}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{color:var(--papier);font-family:var(--sans);font-size:clamp(16px,1.12vw,19px);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--magenta);outline-offset:4px}
+.mono{font-family:var(--mono);font-stretch:87.5%;font-size:.72rem;letter-spacing:.02em;text-transform:uppercase}
+.lecteur{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#webgl{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+/* ─── préchargeur : quatre plaques qui se remplissent ─── */
+#prechargeur{position:fixed;inset:0;z-index:50;background:var(--nuit);display:flex;flex-direction:column;justify-content:space-between;padding:var(--g);transition:opacity .9s,visibility .9s;cursor:pointer}
+#prechargeur.fini{opacity:0;visibility:hidden}
+.pre-haut{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.pre-marque{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 850;font-size:clamp(1.4rem,2vw,1.9rem);text-transform:uppercase;line-height:1}
+.compteur{font-family:var(--large);font-variation-settings:"wdth" 150,"wght" 200;font-size:clamp(3.4rem,8vw,7.5rem);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--brume)}
+.consigne{display:flex;align-items:center;gap:clamp(18px,3vw,44px)}
+.consigne p{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 850;font-size:clamp(2.8rem,9vw,10rem);line-height:.86;text-transform:uppercase;max-width:9ch}
+.consigne p .l{display:inline-block;white-space:pre}
+.mot{display:inline-block;white-space:nowrap}
+.souris{flex:none;width:clamp(30px,3vw,44px);aspect-ratio:3/5;border:1.5px solid var(--brume);border-radius:999px;position:relative}
+.souris i{position:absolute;left:50%;top:18%;width:3px;height:16%;margin-left:-1.5px;border-radius:2px;background:var(--magenta);animation:molette 1.6s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes molette{0%{transform:translateY(0);opacity:0}25%{opacity:1}80%{transform:translateY(160%);opacity:0}100%{opacity:0}}
+.pouce{flex:none;width:clamp(36px,4vw,52px);height:auto;color:var(--papier);overflow:visible;display:none}
+.pouce-geste{animation:glisse 1.8s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes glisse{0%,15%{transform:translateY(10px);opacity:0}30%{opacity:1}75%{transform:translateY(-8px);opacity:1}100%{transform:translateY(-12px);opacity:0}}
+@media (pointer:coarse){.souris,.txt-souris{display:none!important}.pouce{display:block}}
+.plaques{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:28px}
+.plaques span{height:6px;background:rgba(242,239,232,.08);position:relative;overflow:hidden}
+.plaques span i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0)}
+.pre-bas{display:flex;justify-content:space-between;gap:20px;color:var(--brume);margin-top:14px}
+
+/* ─── en-tête : texte seul, en différence ─── */
+header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px var(--g);mix-blend-mode:difference;color:#fff;transition:transform .45s cubic-bezier(.65,0,.35,1)}
+header.cache{transform:translateY(-110%)}
+.marque{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 850;font-size:1.55rem;line-height:1;text-transform:uppercase;text-decoration:none;display:flex;align-items:center;gap:.18em}
+.marque i{width:.3em;height:.3em;border-radius:50%;background:#fff;display:inline-block}
+nav{display:flex;gap:clamp(16px,2.4vw,40px);align-items:center}
+nav a{text-decoration:none;position:relative;padding:12px 0}
+nav a::after{content:"";position:absolute;left:0;right:0;bottom:8px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s cubic-bezier(.65,0,.35,1)}
+nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.langue{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:12px 0}
+.langue b{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:760px){nav .cache-mobile{display:none}}
+
+/* ─── 1. le tirage : récit épinglé sur la feuille WebGL ─── */
+.recit{height:520vh;position:relative}
+.collant{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.ch{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:120px var(--g) clamp(34px,6vh,64px);pointer-events:none}
+.ch.droite{align-items:flex-end;text-align:right}
+.ch h2,.ch .grand{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 850;font-weight:850;text-transform:uppercase;line-height:.84;letter-spacing:-.01em;font-size:clamp(3rem,8.4vw,9.6rem)}
+.ch p.suite{margin-top:22px;max-width:32ch;font-size:clamp(1.05rem,1.45vw,1.4rem);line-height:1.45;color:var(--brume)}
+.ch .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;pointer-events:auto}
+.ch.final{justify-content:center}
+.ch.final .grand{max-width:12ch}
+.ligne{display:block;overflow:hidden;padding:.08em 0 .04em;margin:-.08em 0 -.04em}
+.ligne > span{display:block;will-change:transform}
+.l{display:inline-block}
+.instrument{position:absolute;left:var(--g);top:92px;font-family:var(--mono);font-stretch:87.5%;font-size:.7rem;line-height:1.7;color:var(--brume);text-transform:uppercase;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.instrument b{color:var(--papier);font-weight:500}
+.instrument .pastille{display:inline-block;width:8px;height:8px;margin-right:8px;vertical-align:1px;background:var(--cyan)}
+@media (max-width:760px){.instrument{top:78px;font-size:.62rem}}
+.defile{position:absolute;right:var(--g);bottom:clamp(34px,6vh,64px);display:flex;align-items:center;gap:14px;color:var(--papier)}
+.defile::after{content:"";width:1px;height:46px;background:linear-gradient(var(--brume),transparent);animation:goutte 2.2s ease-in-out infinite}
+@keyframes goutte{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media (max-width:760px){.defile{display:none}}
+/* repli sans WebGL */
+.repli{display:none}
+.sans-gl .repli{display:flex;position:absolute;inset:0;align-items:center;justify-content:center;padding:var(--g)}
+.sans-gl .repli span{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 900;text-transform:uppercase;font-size:clamp(4rem,14vw,15rem);line-height:.84;text-align:center;color:var(--papier)}
+
+.btn{display:inline-flex;align-items:center;gap:28px;justify-content:space-between;min-height:56px;padding:0 24px;text-decoration:none;font-size:1rem;font-weight:500;border:1px solid currentColor;transition:background .3s,color .3s,border-color .3s}
+.btn svg{width:14px;height:14px;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.btn:hover svg{transform:translate(3px,3px)}
+.btn-plein{background:var(--papier);color:var(--encre);border-color:var(--papier)}
+.btn-plein:hover{background:var(--magenta);border-color:var(--magenta);color:var(--encre)}
+.btn-vide:hover{background:var(--papier);color:var(--encre)}
+
+/* ─── transition : une trame de points qui grossit ─── */
+.trame{position:relative;z-index:2;height:46vh;display:grid;grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(7,1fr);margin-top:-46vh;pointer-events:none;overflow:hidden}
+.trame i{display:block;border-radius:50%;background:var(--papier);transform:scale(0);margin:-12%}
+.trame i.c{background:var(--cyan)}.trame i.m{background:var(--magenta)}
+
+/* ─── sections claires : papier non couché ─── */
+.clair{position:relative;z-index:2;background-color:var(--papier);color:var(--encre);
+  background-image:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.9 .02' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 .3  0 0 0 0 .27  0 0 0 0 .22  0 0 0 .22 -.06'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>"),
+  radial-gradient(110% 80% at 80% 0%,rgba(255,255,255,.65),transparent 60%),
+  radial-gradient(90% 80% at 0% 100%,rgba(18,18,17,.08),transparent 60%)}
+
+/* ─── 2. piste horizontale : le catalogue ─── */
+.horiz{height:100vh;height:100svh;overflow:hidden;position:relative}
+.piste{display:flex;height:100%;width:max-content;will-change:transform}
+.panneau{height:100%;flex:none;display:flex;flex-direction:column;justify-content:space-between;padding:110px var(--g) clamp(88px,12vh,116px)}
+.ouverture{width:min(80vw,1120px);display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:clamp(24px,4vw,70px)}
+.ouverture h2{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 850;text-transform:uppercase;font-size:clamp(3.6rem,11vw,12rem);line-height:.82;letter-spacing:-.01em}
+.ouverture .texte{display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+.ouverture p{max-width:34ch;font-size:clamp(1.05rem,1.35vw,1.25rem);color:var(--douce)}
+.ouverture .compte{font-family:var(--large);font-variation-settings:"wdth" 150,"wght" 200;font-size:clamp(4rem,9vw,9rem);line-height:.8;letter-spacing:-.04em}
+.produit{width:clamp(300px,36vw,600px);border-left:1px solid var(--trait);gap:clamp(16px,2.6vh,28px)}
+.produit .tete{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.produit h3{font-family:var(--large);font-variation-settings:"wdth" 150,"wght" 300;font-weight:300;text-transform:uppercase;font-size:clamp(2.2rem,3.8vw,4.4rem);line-height:.9;letter-spacing:-.02em;white-space:nowrap}
+.produit p{max-width:34ch;color:var(--douce);font-size:clamp(1rem,1.25vw,1.2rem)}
+.produit .pied-p{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:14px;border-top:1px solid var(--trait)}
+.produit .pied-p a{text-decoration:none;font-weight:500;display:inline-flex;align-items:center;gap:10px;min-height:44px}
+.produit .pied-p a:hover{color:var(--mag-fonce)}
+.photo{position:relative;overflow:hidden;flex:1;min-height:0;background:#E3DED4}
+.photo img{position:absolute;inset:-6% -8%;width:116%;height:112%;object-fit:cover;filter:contrast(1.08) saturate(1.05);will-change:transform}
+.photo::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:multiply;opacity:.16;
+  background-image:radial-gradient(circle at 50% 50%,#121211 32%,transparent 34%);background-size:5px 5px}
+.photo figcaption{position:absolute;left:12px;bottom:10px;z-index:3;color:rgba(255,255,255,.9);text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.photo .trou{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--douce)}
+.voile{position:absolute;inset:-14%;filter:url(#encre);pointer-events:none;z-index:2}
+.voile i{position:absolute;inset:0;background:var(--papier);will-change:transform}
+.produit.noir{background:var(--encre);color:var(--papier);border-left:0}
+.produit.noir p{color:var(--brume)}
+.produit.noir .pied-p{border-color:rgba(242,239,232,.2)}
+.produit.noir .pied-p a:hover{color:var(--magenta)}
+.vierge{display:flex;align-items:center;justify-content:center;background:transparent!important}
+.vierge svg{width:min(70%,340px);height:auto;overflow:visible}
+.avancer{position:fixed;left:50%;bottom:clamp(18px,3.5vh,34px);z-index:30;transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:14px;padding:11px 18px 11px 20px;border-radius:999px;background:var(--encre);color:var(--papier);font-size:.88rem;transition:opacity .35s,transform .35s}
+.avancer.actif{opacity:1;transform:translate(-50%,0)}
+.avancer .progres{width:clamp(60px,9vw,120px);height:2px;background:rgba(242,239,232,.18);overflow:hidden}
+.avancer .progres i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta),var(--jaune));transform-origin:left;transform:scaleX(0)}
+@media (max-width:760px){.ouverture{width:88vw;grid-template-columns:1fr}.produit{width:84vw}}
+
+/* ─── 3. la phrase qui s'encre ─── */
+.phrase{position:relative;z-index:2;background:var(--encre);color:var(--papier);padding:clamp(110px,18vh,200px) var(--g);min-height:100vh;display:flex;flex-direction:column;justify-content:center;gap:clamp(40px,8vh,90px)}
+.phrase blockquote{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 850;text-transform:uppercase;font-size:clamp(3rem,8.2vw,9.4rem);line-height:.86;letter-spacing:-.01em;max-width:14ch}
+.phrase blockquote .mot{color:rgba(242,239,232,.12)}
+.phrase .bas{display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;color:var(--brume);align-items:flex-end}
+.phrase .bas p{max-width:40ch}
+
+/* ─── 4. bon de commande ─── */
+.bon{padding:clamp(110px,16vh,180px) var(--g);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(36px,6vw,110px);align-items:start}
+.bon h2{font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 850;text-transform:uppercase;font-size:clamp(3.4rem,8vw,9rem);line-height:.84;letter-spacing:-.01em}
+.bon .intro p{margin-top:26px;max-width:34ch;font-size:clamp(1.05rem,1.35vw,1.25rem);color:var(--douce)}
+.bon .intro .mono{color:var(--mag-fonce)}
+.ticket{position:relative;background:#FBFAF6;border:1px solid var(--encre);box-shadow:12px 12px 0 var(--encre)}
+.perfo{height:16px;background:radial-gradient(circle at 8px 8px,var(--papier) 4.5px,var(--encre) 5px,transparent 5.5px) 0 0/20px 16px repeat-x;border-bottom:1px dashed var(--trait)}
+.ticket form{padding:clamp(24px,3.4vw,48px);display:flex;flex-direction:column;gap:30px}
+.ticket .entete-t{display:flex;justify-content:space-between;gap:12px;color:var(--douce)}
+fieldset{border:0}
+legend{margin-bottom:14px}
+.puces{display:flex;flex-wrap:wrap;gap:8px}
+.puces button{min-height:44px;padding:0 18px;border:1px solid var(--encre);border-radius:999px;background:transparent;color:var(--encre);font:inherit;font-size:.98rem;cursor:pointer;transition:background .25s,color .25s}
+.puces button[aria-pressed="true"]{background:var(--encre);color:var(--papier)}
+.puces button:hover{border-color:var(--mag-fonce)}
+.champs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.champ{display:flex;flex-direction:column;gap:8px}
+.champ input,.champ textarea{border:0;border-bottom:1px solid var(--encre);background:transparent;font:inherit;font-size:1.25rem;padding:6px 0 10px;color:var(--encre);border-radius:0;outline:none}
+.champ input:focus,.champ textarea:focus{border-bottom:2px solid var(--magenta)}
+.ticket .envoyer{width:100%;justify-content:space-between;background:var(--encre);color:var(--papier);border-color:var(--encre);cursor:pointer;font-family:var(--sans)}
+.ticket .envoyer:hover{background:var(--magenta);border-color:var(--magenta);color:var(--encre)}
+.tampon{position:absolute;right:8%;top:38%;padding:14px 26px;border:5px solid var(--magenta);color:var(--magenta);font-family:var(--large);font-variation-settings:"wdth" 62,"wght" 900;text-transform:uppercase;font-size:clamp(3rem,6vw,5.6rem);line-height:.9;text-align:center;opacity:0;pointer-events:none;mix-blend-mode:multiply;transform:rotate(-12deg) scale(2.6);
+  -webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='t'><feTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 1.9'/></filter><rect width='100%' height='100%' filter='url(%23t)'/></svg>");
+  mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='t'><feTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 1.9'/></filter><rect width='100%' height='100%' filter='url(%23t)'/></svg>")}
+.tampon small{display:block;font-family:var(--mono);font-size:.7rem;letter-spacing:.04em;font-variation-settings:normal;margin-top:6px}
+.note-maquette{font-size:.8rem;color:var(--douce)}
+@media (max-width:860px){.bon{grid-template-columns:1fr}.champs{grid-template-columns:1fr}}
+
+/* ─── 5. pied ─── */
+.pied{position:relative;z-index:2;background:var(--nuit);color:var(--brume);padding:clamp(80px,12vh,140px) var(--g) 30px}
+.pied .colonnes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(24px,4vw,60px);margin-bottom:clamp(60px,10vh,120px)}
+.pied h4{margin-bottom:12px;font-weight:400}
+.pied .colonnes p,.pied .colonnes a{color:var(--papier);text-decoration:none;display:block;line-height:1.6}
+.pied .colonnes a:hover{color:var(--magenta)}
+.pied .grand{display:block;font-family:var(--large);font-variation-settings:"wdth" 150,"wght" 150;text-transform:uppercase;white-space:nowrap;font-size:clamp(3rem,13.4vw,17rem);line-height:.8;letter-spacing:-.04em;color:var(--papier);text-decoration:none;user-select:none}
+.barre-ctrl{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));height:14px;margin-top:clamp(36px,6vh,60px);border:1px solid rgba(242,239,232,.25)}
+.barre-ctrl span{border-right:1px solid rgba(242,239,232,.12)}
+.pied .ligne-bas{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:20px}
+@media (max-width:860px){.pied .colonnes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* bouton flottant */
+.flottant{position:fixed;right:var(--g);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:35;display:inline-flex;align-items:center;gap:12px;min-height:56px;padding:0 24px;border-radius:999px;
+  background:var(--encre);color:var(--papier);text-decoration:none;white-space:nowrap;box-shadow:0 14px 34px -12px rgba(0,0,0,.5);transform:translateY(160%);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.flottant .pts{display:flex}
+.flottant .pts i{width:10px;height:10px;border-radius:50%;margin-left:-3px;mix-blend-mode:screen}
+.flottant.vu{transform:none}
+body.indicateur .flottant{transform:translateY(160%)}
+@media (max-width:760px){.flottant{left:16px;right:16px;justify-content:center}}
+.evitement{position:fixed;left:16px;top:-80px;z-index:60;background:var(--papier);color:var(--encre);padding:12px 18px;font-weight:600}
+.evitement:focus{top:16px}
+
+/* grain et curseur */
+body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;opacity:.08;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.25 -.1'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}100%{transform:translate(0,0)}}
+#curseur{position:fixed;inset:0;z-index:45;pointer-events:none}
+@media (pointer:fine){body.curseur-actif, body.curseur-actif a, body.curseur-actif button{cursor:none}}
+@media (pointer:coarse){#curseur{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<a class="evitement" href="#catalogue">Aller au catalogue</a>
+
+<div id="prechargeur" role="dialog" aria-label="Chargement">
+  <div class="pre-haut"><span class="pre-marque">Printshop · MTL</span><span class="compteur" aria-live="polite">0</span></div>
+  <div class="consigne"><span class="souris" aria-hidden="true"><i></i></span><svg class="pouce" viewBox="0 0 40 64" aria-hidden="true"><g class="pouce-geste"><path d="M14 30V12a4 4 0 0 1 8 0v14l9 2.4a5 5 0 0 1 3.6 5.8L32 48a8 8 0 0 1-8 6.5h-4.5a8 8 0 0 1-6.4-3.2L7 43.3a3.4 3.4 0 0 1 4.9-4.6L14 41" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></g></svg><p id="consigne">Calage des plaques</p></div>
+  <div>
+    <div class="plaques" aria-hidden="true"><span><i style="background:var(--cyan)"></i></span><span><i style="background:var(--magenta)"></i></span><span><i style="background:var(--jaune)"></i></span><span><i style="background:var(--papier)"></i></span></div>
+    <div class="pre-bas mono"><span id="pre-etat">Encrage en cours</span><span>Montréal, QC</span></div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="encre" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency=".018 .06" numOctaves="3" seed="3" result="b"/>
+    <feDisplacementMap in="SourceGraphic" in2="b" scale="70" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+<canvas id="webgl" aria-hidden="true"></canvas>
+<canvas id="curseur" aria-hidden="true"></canvas>
+<div class="avancer" id="avancer" aria-hidden="true"><span class="txt-souris">Défilez pour avancer</span><span class="progres"><i></i></span></div>
+
+<header id="entete">
+  <a class="marque" href="#recit" aria-label="Printshop MTL, accueil">Printshop<i></i>MTL</a>
+  <nav aria-label="Navigation principale">
+    <a href="#catalogue" class="cache-mobile">Catalogue</a>
+    <a href="#bon" class="cache-mobile">Entreprises</a>
+    <a href="#infos" class="cache-mobile">Nous trouver</a>
+    <button type="button" class="langue" id="langue" aria-label="Langue : français. Passer à l’anglais"><b>FR</b> / EN</button>
+    <a href="https://printshopmtl.com/cart">Panier</a>
+  </nav>
+</header>
+
+<main>
+  <!-- 1. le tirage -->
+  <section class="recit" id="recit" aria-label="Présentation">
+    <div class="collant">
+      <h1 class="lecteur">Printshop MTL — imprimé à Montréal : vêtements, autocollants, enseignes et papier peint</h1>
+      <div class="repli" aria-hidden="true"><span>Imprimé<br>à Montréal.</span></div>
+      <div class="instrument" id="instrument" aria-hidden="true">
+        <div><span class="pastille" id="i-pastille"></span><b id="i-passe">Passe 01 / 04</b> — <span id="i-encre">Cyan</span></div>
+        <div>Trame <span id="i-angle">15°</span> · Repérage <span id="i-rep">±0,60 mm</span></div>
+        <div>Épreuve n° 001 · Bon à tirer</div>
+      </div>
+      <div class="ch" id="ch0">
+        <p class="mono" style="color:var(--brume)">Imprimerie locale — Montréal</p>
+        <p class="suite">Vêtements, autocollants, enseignes, papier peint. Défilez : on lance le tirage.</p>
+      </div>
+      <div class="ch droite" id="ch1">
+        <h2><span class="ligne"><span>Quatre</span></span><span class="ligne"><span>encres.</span></span></h2>
+        <p class="suite">Cyan, magenta, jaune, noir. Chaque passe ajoute une couleur, jusqu’au noir profond.</p>
+      </div>
+      <div class="ch" id="ch2">
+        <h2><span class="ligne"><span>Une seule</span></span><span class="ligne"><span>feuille.</span></span></h2>
+        <p class="suite">Les plaques se calent au dixième de millimètre. Passez la souris sur l’épreuve : le compte-fils grossit la trame.</p>
+      </div>
+      <div class="ch final" id="ch3">
+        <p class="grand"><span class="ligne"><span>De la pièce</span></span><span class="ligne"><span>unique à la</span></span><span class="ligne"><span>commande</span></span><span class="ligne"><span>d’équipe.</span></span></p>
+        <div class="actions">
+          <a class="btn btn-plein" href="#catalogue">Commander en ligne <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 3v10H3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+          <a class="btn btn-vide" href="#bon">Demander une soumission <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 3v10H3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></a>
+        </div>
+      </div>
+      <div class="defile mono" id="defile"><span>Défilez</span></div>
+    </div>
+  </section>
+
+  <div class="trame" id="trame" aria-hidden="true"></div>
+
+  <!-- 2. catalogue horizontal -->
+  <section class="clair horiz" id="catalogue" aria-label="Catalogue">
+    <div class="piste">
+      <div class="panneau ouverture">
+        <h2>Cata&shy;logue</h2>
+        <div class="texte">
+          <span class="compte">07</span>
+          <p>Commandez directement en ligne, ou envoyez-nous votre projet pour un prix sur mesure. Petites et grandes quantités.</p>
+          <p class="mono" style="color:var(--douce)">Faites défiler →</p>
+        </div>
+      </div>
+
+      <article class="panneau produit">
+        <div class="tete"><span class="mono">01 / 07</span><span class="mono">Adultes</span></div>
+        <h3>Vêtements</h3>
+        <figure class="photo"><img src="https://printshopmtl.com/cdn/shop/files/1._Apparel_Adult.png?v=1746579648&amp;width=1400" alt="Vêtements imprimés pour adultes" loading="lazy" onerror="this.remove()"><figcaption class="mono">Visuel : printshopmtl.com</figcaption></figure>
+        <p>T-shirts, camisoles, crewnecks, hoodies, hoodies zippés, pantalons, polos, tabliers, sacs, casquettes.</p>
+        <div class="pied-p"><span class="mono">En ligne</span><a href="https://printshopmtl.com/pages/apparel">Voir la collection <span aria-hidden="true">→</span></a></div>
+      </article>
+
+      <article class="panneau produit">
+        <div class="tete"><span class="mono">02 / 07</span><span class="mono">Jeunes</span></div>
+        <h3>Jeunesse</h3>
+        <figure class="photo"><img src="https://printshopmtl.com/cdn/shop/files/2._Apparel_Youth.png?v=1746579647&amp;width=1400" alt="Vêtements imprimés pour jeunes" loading="lazy" onerror="this.remove()"><figcaption class="mono">Visuel : printshopmtl.com</figcaption></figure>
+        <p>T-shirts, crewnecks et hoodies en tailles jeunesse : équipes sportives, écoles, camps.</p>
+        <div class="pied-p"><span class="mono">En ligne</span><a href="https://printshopmtl.com/collections/youth-hoodie">Voir la collection <span aria-hidden="true">→</span></a></div>
+      </article>
+
+      <article class="panneau produit noir">
+        <div class="tete"><span class="mono">03 / 07</span><span class="mono">Votre design</span></div>
+        <h3>Créer le vôtre</h3>
+        <div class="photo vierge" aria-hidden="true">
+          <svg viewBox="0 0 200 200">
+            <path id="chandail" d="M70 30l-40 18-18 40 26 12 10-20v100h104V80l10 20 26-12-18-40-40-18c-4 14-16 22-30 22s-26-8-30-22z" fill="none" stroke="#F2EFE8" stroke-width="1.2"/>
+            <g style="mix-blend-mode:screen">
+              <circle class="enc" cx="92" cy="104" r="22" fill="#00AEEF"/>
+              <circle class="enc" cx="108" cy="104" r="22" fill="#EC008C"/>
+              <circle class="enc" cx="100" cy="118" r="22" fill="#FFF200"/>
+            </g>
+            <path d="M8 8h14M8 8v14M192 8h-14M192 8v14M8 192h14M8 192v-14M192 192h-14M192 192v-14" stroke="#F2EFE8" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+        <p>Choisissez un vêtement vierge, envoyez votre logo ou votre dessin : on l’imprime, même à partir d’une seule pièce.</p>
+        <div class="pied-p"><span class="mono">En ligne</span><a href="https://printshopmtl.com/collections/blank-apparel">Commencer <span aria-hidden="true">→</span></a></div>
+      </article>
+
+      <article class="panneau produit">
+        <div class="tete"><span class="mono">04 / 07</span><span class="mono">Toutes formes</span></div>
+        <h3>Autocollants</h3>
+        <figure class="photo"><img src="https://printshopmtl.com/cdn/shop/files/5._Labels_and_Stickers.png?v=1746579647&amp;width=1400" alt="Autocollants et étiquettes imprimés" loading="lazy" onerror="this.remove()"><figcaption class="mono">Visuel : printshopmtl.com</figcaption></figure>
+        <p>Étiquettes pour produits, emballages, bouteilles et vitrines.</p>
+        <div class="pied-p"><span class="mono">En ligne</span><a href="https://printshopmtl.com/collections/labels-stickers">Voir la collection <span aria-hidden="true">→</span></a></div>
+      </article>
+
+      <article class="panneau produit">
+        <div class="tete"><span class="mono">05 / 07</span><span class="mono">Intérieur · extérieur</span></div>
+        <h3>Enseignes</h3>
+        <figure class="photo"><img src="https://printshopmtl.com/cdn/shop/files/3._Signs_and_Banners.png?v=1746579646&amp;width=1400" alt="Enseignes et bannières imprimées" loading="lazy" onerror="this.remove()"><figcaption class="mono">Visuel : printshopmtl.com</figcaption></figure>
+        <p>Coroplast, chevalets, cadres en H, bannières et affiches grand format pour les commerces.</p>
+        <div class="pied-p"><span class="mono">En ligne</span><a href="https://printshopmtl.com/collections/sign-banners">Voir la collection <span aria-hidden="true">→</span></a></div>
+      </article>
+
+      <article class="panneau produit">
+        <div class="tete"><span class="mono">06 / 07</span><span class="mono">Au pied carré</span></div>
+        <h3>Papier peint</h3>
+        <figure class="photo"><img src="https://printshopmtl.com/cdn/shop/files/RENDER_0040_-_MOCKUP.jpg?v=1775250487&amp;width=1400" alt="Papier peint posé dans une pièce" loading="lazy" onerror="this.remove()"><figcaption class="mono">Visuel : printshopmtl.com</figcaption></figure>
+        <p>Brique, béton, bois, marbre, pierre, floral, géométrique, et des motifs pour les chambres d’enfants.</p>
+        <div class="pied-p"><span class="mono">En ligne</span><a href="https://printshopmtl.com/pages/wallpapers">Voir les motifs <span aria-hidden="true">→</span></a></div>
+      </article>
+
+      <article class="panneau produit">
+        <div class="tete"><span class="mono">07 / 07</span><span class="mono">Sur soumission</span></div>
+        <h3>Événements</h3>
+        <figure class="photo"><img src="https://printshopmtl.com/cdn/shop/files/7._Corporate_Events.png?v=1746579648&amp;width=1400" alt="Impression pour événement corporatif" loading="lazy" onerror="this.remove()"><figcaption class="mono">Visuel : printshopmtl.com</figcaption></figure>
+        <p>Décor, signalisation et articles imprimés pour les événements d’entreprise.</p>
+        <div class="pied-p"><span class="mono">Soumission</span><a href="#bon">Remplir le bon <span aria-hidden="true">→</span></a></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 3. la phrase -->
+  <section class="phrase" id="phrase-sec" aria-label="Pour qui">
+    <blockquote id="phrase">Un t-shirt pour <em data-c="#00AEEF">vous.</em> Des hoodies pour votre <em data-c="#EC008C">équipe.</em> Une enseigne pour votre <em data-c="#FFF200">commerce.</em></blockquote>
+    <div class="bas"><p>Commerces, équipes, écoles, organismes, événements : on imprime pour les gens d’ici.</p><span class="mono">[Ajouter un vrai client ou une vraie réalisation]</span></div>
+  </section>
+
+  <!-- 4. bon de commande -->
+  <section class="clair bon" id="bon" aria-label="Demande de soumission">
+    <div class="intro">
+      <span class="mono">Pour les entreprises</span>
+      <h2 style="margin-top:18px">Bon de<br>commande</h2>
+      <p>Uniformes, kits d’employés, signalisation, décor d’événement. Remplissez le bon : on vous revient avec un prix.</p>
+    </div>
+    <div class="ticket">
+      <div class="perfo" aria-hidden="true"></div>
+      <form id="formulaire" novalidate>
+        <div class="entete-t mono"><span>Bon n° <span id="no-bon">0001</span></span><span id="date-bon"></span></div>
+        <fieldset>
+          <legend class="mono">A — Produit(s)</legend>
+          <div class="puces">
+            <button type="button" aria-pressed="true">Vêtements</button>
+            <button type="button" aria-pressed="false">Casquettes et sacs</button>
+            <button type="button" aria-pressed="false">Autocollants</button>
+            <button type="button" aria-pressed="false">Enseignes</button>
+            <button type="button" aria-pressed="false">Bannières</button>
+            <button type="button" aria-pressed="false">Papier peint</button>
+            <button type="button" aria-pressed="false">Événement</button>
+          </div>
+        </fieldset>
+        <div class="champs">
+          <label class="champ"><span class="mono">B — Nom ou entreprise</span><input type="text" name="nom" autocomplete="organization"></label>
+          <label class="champ"><span class="mono">C — Courriel</span><input type="email" name="courriel" autocomplete="email"></label>
+          <label class="champ"><span class="mono">D — Quantité</span><input type="text" name="quantite" inputmode="numeric"></label>
+          <label class="champ"><span class="mono">E — Pour quand?</span><input type="text" name="date"></label>
+        </div>
+        <label class="champ"><span class="mono">F — Votre projet</span><textarea name="projet" rows="2"></textarea></label>
+        <button type="submit" class="btn envoyer">Envoyer le bon <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 1l12 12M13 3v10H3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></button>
+        <p class="note-maquette">Maquette : l’envoi sera branché sur le courriel de la boutique.</p>
+      </form>
+      <div class="tampon" id="tampon" aria-hidden="true">Reçu<small>Bon à tirer</small></div>
+      <p class="lecteur" id="confirmation" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="pied" id="infos">
+  <div class="colonnes">
+    <div><h4 class="mono">Atelier</h4><p>[Adresse à confirmer]</p><p>Montréal, QC</p></div>
+    <div><h4 class="mono">Heures</h4><p>[Lun – ven]</p><p>[Sam – dim]</p></div>
+    <div><h4 class="mono">Contact</h4><p>[Téléphone]</p><p>[Courriel]</p></div>
+    <div><h4 class="mono">Boutique</h4><a href="https://printshopmtl.com/collections/tshirts">T-shirts</a><a href="https://printshopmtl.com/collections/hoodies-2">Hoodies</a><a href="https://printshopmtl.com/collections/labels-stickers">Autocollants</a><a href="https://printshopmtl.com/collections/sign-banners">Enseignes</a></div>
+  </div>
+  <a class="grand" href="#recit" aria-label="Retour en haut">Printshop</a>
+  <div class="barre-ctrl" aria-hidden="true">
+    <span style="background:#00AEEF"></span><span style="background:#EC008C"></span><span style="background:#FFF200"></span><span style="background:#121211"></span>
+    <span style="background:#66CEF5"></span><span style="background:#F466BA"></span><span style="background:#FFF766"></span><span style="background:#5a5752"></span>
+    <span style="background:#B3E7FA"></span><span style="background:#F9B3DD"></span><span style="background:#FFFBB3"></span><span style="background:#9a958c"></span>
+    <span style="background:#2E3192"></span><span style="background:#00A651"></span><span style="background:#ED1C24"></span><span style="background:#F2EFE8"></span>
+  </div>
+  <div class="ligne-bas mono"><span>Livraison Canada (CAD) · États-Unis (USD)</span><span>Visa · Mastercard · Amex · Apple Pay · Google Pay · PayPal · Shop Pay</span><span>© 2026 Printshop MTL — maquette Spiralia</span></div>
+</footer>
+<a class="flottant" id="flottant" href="#bon"><span class="pts" aria-hidden="true"><i style="background:#00AEEF"></i><i style="background:#EC008C"></i><i style="background:#FFF200"></i></span>Demander une soumission</a>
+
+<script>
+(function(){
+  // date du bon
+  const d=new Date(); document.getElementById("date-bon").textContent=d.toLocaleDateString("fr-CA",{day:"2-digit",month:"long",year:"numeric"});
+  // puces du bon
+  document.querySelectorAll(".puces button").forEach(b=>b.addEventListener("click",()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")==="true"?"false":"true")));
+  // phrase : un mot = un span
+  const q=document.getElementById("phrase");
+  [...q.childNodes].forEach(n=>{
+    if(n.nodeType===3){ const f=document.createDocumentFragment(); n.textContent.split(/(\s+)/).forEach(t=>{ if(!t) return; if(/^\s+$/.test(t)) f.append(t); else { const s=document.createElement("span"); s.className="mot"; s.textContent=t; f.append(s);} }); n.replaceWith(f); }
+    else if(n.tagName==="EM"){ n.classList.add("mot"); n.style.fontStyle="normal"; }
+  });
+  // langue (maquette : bascule visuelle seulement)
+  const lg=document.getElementById("langue"); let fr=true;
+  lg.addEventListener("click",()=>{ fr=!fr; lg.innerHTML=fr?"<b>FR</b> / EN":"FR / <b>EN</b>"; lg.setAttribute("aria-label",fr?"Langue : français. Passer à l’anglais":"Language: English. Switch to French"); });
+})();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+
+<!-- parcours : piste horizontale, trame, phrase, bon, pied, curseur -->
+<script>
+(function(){
+  const gsap=window.gsap; if(!gsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+  const reduit=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const tactile=matchMedia("(pointer: coarse)").matches;
+  function lettres(el){ el.innerHTML = el.textContent.split(" ").map(m=>'<span class="mot">'+[...m].map(c=>'<span class="l">'+c+'</span>').join("")+'</span>').join(" "); return el.querySelectorAll(".l"); }
+
+  // transition : trame de points qui grossit, une rangée après l'autre
+  const tr=document.getElementById("trame"), cols=innerWidth<760?12:28;
+  tr.style.setProperty("--cols",cols);
+  const rangs=[];
+  for(let r=0;r<7;r++){ const rang=[]; for(let c=0;c<cols;c++){ const i=document.createElement("i"); const x=Math.random(); if(r<4 && x<.05) i.className="c"; else if(r<5 && x<.09) i.className="m"; tr.appendChild(i); rang.push(i);} rangs.push(rang); }
+  const tlTrame=gsap.timeline({scrollTrigger:{trigger:tr,start:"top bottom",end:"bottom bottom",scrub:true}});
+  rangs.forEach((rang,r)=>{ tlTrame.to(rang,{scale:1.7,duration:1,ease:"power1.in",stagger:{each:.02,from:"random"}},(6-r)*.35); });
+
+  // en-tête qui se cache en descendant
+  const ent=document.getElementById("entete"); let dernier=0;
+  ScrollTrigger.create({start:0,end:"max",onUpdate:st=>{ const y=st.scroll(); ent.classList.toggle("cache", y>dernier && y>200); dernier=y; }});
+
+  // curseur : un repère d'imprimeur ; à grande vitesse les trois encres décrochent
+  const cv=document.getElementById("curseur");
+  if(!tactile && !reduit){
+    document.body.classList.add("curseur-actif");
+    const cx=cv.getContext("2d"), dpr=Math.min(devicePixelRatio,2);
+    const taille=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;}; taille(); addEventListener("resize",taille);
+    const cible={x:-80,y:-80}, pos={x:-80,y:-80}; let vx=0, vy=0, survol=0, cibleSurvol=0;
+    addEventListener("mousemove",e=>{cible.x=e.clientX;cible.y=e.clientY; const t=e.target.closest&&e.target.closest("a,button,input,textarea"); cibleSurvol=t?1:0;});
+    const repere=(x,y,r,couleur)=>{ cx.strokeStyle=couleur; cx.lineWidth=1.3; cx.beginPath(); cx.arc(x,y,r,0,Math.PI*2); cx.moveTo(x-r-7,y); cx.lineTo(x+r+7,y); cx.moveTo(x,y-r-7); cx.lineTo(x,y+r+7); cx.stroke(); };
+    gsap.ticker.add(()=>{
+      const ax=pos.x, ay=pos.y;
+      pos.x+=(cible.x-pos.x)*.22; pos.y+=(cible.y-pos.y)*.22;
+      vx+=((pos.x-ax)-vx)*.3; vy+=((pos.y-ay)-vy)*.3;
+      survol+=(cibleSurvol-survol)*.18;
+      const r=7+9*survol;
+      cx.setTransform(dpr,0,0,dpr,0,0); cx.clearRect(0,0,innerWidth,innerHeight);
+      const k=Math.min(1,Math.hypot(vx,vy)/26);
+      if(k>.04){
+        cx.globalCompositeOperation="lighter";
+        repere(pos.x-vx*.9,pos.y-vy*.9,r,`rgba(0,174,239,${k})`);
+        repere(pos.x-vx*1.7,pos.y-vy*1.7,r,`rgba(236,0,140,${k})`);
+        repere(pos.x-vx*2.5,pos.y-vy*2.5,r,`rgba(255,242,0,${k*.9})`);
+      }
+      cx.globalCompositeOperation="difference";
+      repere(pos.x,pos.y,r,"#fff");
+      cx.fillStyle="#fff"; cx.fillRect(pos.x-1.5,pos.y-1.5,3,3);
+    });
+  }
+
+  // catalogue : piste horizontale épinglée
+  document.querySelectorAll(".horiz").forEach(sec=>{
+    const piste=sec.querySelector(".piste");
+    const dist=()=>Math.max(0,piste.scrollWidth-innerWidth);
+    const tw=gsap.to(piste,{x:()=>-dist(),ease:"none",scrollTrigger:{trigger:sec,pin:true,start:"top top",end:()=>"+="+dist(),scrub:1,invalidateOnRefresh:true,anticipatePin:1}});
+    // les noms s'élargissent en entrant, puis se resserrent en sortant
+    sec.querySelectorAll(".produit h3").forEach(h=>{
+      gsap.fromTo(h,{fontVariationSettings:'"wdth" 50,"wght" 900'},{fontVariationSettings:'"wdth" 150,"wght" 250',ease:"none",
+        scrollTrigger:{trigger:h.closest(".panneau"),containerAnimation:tw,start:"left 95%",end:"left 35%",scrub:true}});
+    });
+    // photos : voile d'encre qui bave, puis l'image glisse dans son cadre
+    sec.querySelectorAll(".photo").forEach(ph=>{
+      const img=ph.querySelector("img");
+      if(!img){ return; }
+      const v=document.createElement("div"); v.className="voile"; v.innerHTML="<i></i>"; ph.appendChild(v);
+      const dejaVisible = ph.getBoundingClientRect().left < innerWidth*.88;
+      gsap.to(v.querySelector("i"),{yPercent:-135,ease:"power2.inOut",duration:1.5,
+        scrollTrigger: dejaVisible ? {trigger:sec,start:"top 35%"} : {trigger:ph,containerAnimation:tw,start:"left 88%"}});
+      gsap.fromTo(img,{xPercent:6},{xPercent:-6,ease:"none",scrollTrigger:{trigger:ph,containerAnimation:tw,start:"left right",end:"right left",scrub:true}});
+    });
+    // le chandail vierge reçoit ses trois encres
+    const encs=sec.querySelectorAll(".vierge .enc");
+    gsap.from(encs,{scale:0,transformOrigin:"center",ease:"back.out(1.6)",duration:.9,stagger:.18,scrollTrigger:{trigger:sec.querySelector(".vierge"),containerAnimation:tw,start:"left 75%"}});
+    gsap.fromTo("#chandail",{strokeDasharray:900,strokeDashoffset:900},{strokeDashoffset:0,ease:"power2.inOut",duration:1.6,scrollTrigger:{trigger:sec.querySelector(".vierge"),containerAnimation:tw,start:"left 85%"}});
+    // compteur de l'ouverture
+    const compte=sec.querySelector(".compte");
+    ScrollTrigger.create({trigger:sec,start:"top top",end:()=>"+="+dist(),onUpdate:st=>{
+      const n=Math.min(7,Math.max(0,Math.round(st.progress*7)));
+      compte.textContent=String(n||7).padStart(2,"0");
+    }});
+    // indicateur « Défilez pour avancer »
+    const ind=document.getElementById("avancer"), barre=ind.querySelector(".progres i");
+    ScrollTrigger.create({trigger:sec,start:"top top",end:()=>"+="+dist(),
+      onToggle:st=>ind.classList.toggle("actif",st.isActive && st.progress<.97),
+      onUpdate:st=>{ barre.style.transform="scaleX("+st.progress+")"; ind.classList.toggle("actif",st.progress<.97); }});
+  });
+
+  // la phrase s'encre mot à mot ; les mots clés prennent leur encre
+  const mots=[...document.querySelectorAll("#phrase .mot")];
+  const tlP=gsap.timeline({scrollTrigger:{trigger:"#phrase-sec",start:"top 70%",end:"center 40%",scrub:1}});
+  mots.forEach((m,i)=>{ tlP.to(m,{color:m.dataset.c||"#F2EFE8",duration:.4,ease:"none"},i*.1); });
+
+  // bon de commande : le ticket monte, le tampon tombe à l'envoi
+  gsap.from(".ticket",{y:80,rotate:1.5,opacity:0,duration:1.2,ease:"expo.out",scrollTrigger:{trigger:"#bon",start:"top 70%"}});
+  gsap.from("#bon h2",{yPercent:20,opacity:0,duration:1.1,ease:"expo.out",scrollTrigger:{trigger:"#bon",start:"top 70%"}});
+  const form=document.getElementById("formulaire"), tampon=document.getElementById("tampon");
+  form.addEventListener("submit",e=>{
+    e.preventDefault();
+    const n=document.getElementById("no-bon"); n.textContent=String(+n.textContent+1).padStart(4,"0");
+    gsap.timeline()
+      .set(tampon,{opacity:0,scale:2.6,rotate:-4})
+      .to(tampon,{opacity:.92,scale:1,rotate:-12,duration:.32,ease:"power4.in"})
+      .to(".ticket",{x:-4,y:3,duration:.05,yoyo:true,repeat:3,ease:"none"},"-=.02");
+    document.getElementById("confirmation").textContent="Demande reçue (maquette).";
+  });
+
+  // pied : les lettres s'épaississent sous le curseur
+  const grand=document.querySelector(".pied .grand");
+  if(grand && !tactile){
+    const ls=lettres(grand);
+    addEventListener("mousemove",e=>{
+      const rb=grand.getBoundingClientRect(); if(e.clientY<rb.top-300) return;
+      ls.forEach(l=>{ const r=l.getBoundingClientRect(); const d=Math.hypot(e.clientX-(r.left+r.width/2), e.clientY-(r.top+r.height/2));
+        const k=Math.max(0,1-d/360); l.style.fontVariationSettings='"wdth" '+Math.round(150-100*k)+',"wght" '+Math.round(150+750*k); l.style.color=k>.55?"#EC008C":""; });
+    });
+  }
+
+  // bouton flottant : après le tirage, jamais sur le bon
+  (function(){
+    const b=document.getElementById("flottant"); let apres=false, surBon=false;
+    const maj=()=>b.classList.toggle("vu",apres&&!surBon);
+    ScrollTrigger.create({trigger:"#catalogue",start:"top 80%",end:"max",onToggle:x=>{apres=x.isActive;maj();}});
+    ScrollTrigger.create({trigger:"#bon",start:"top bottom",end:"bottom top",onToggle:x=>{surBon=x.isActive;maj();}});
+    const ind=document.getElementById("avancer");
+    new MutationObserver(()=>document.body.classList.toggle("indicateur",ind.classList.contains("actif"))).observe(ind,{attributes:true,attributeFilter:["class"]});
+  })();
+})();
+</script>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from "three";
+
+const gsap = window.gsap, ScrollTrigger = window.ScrollTrigger;
+const reduit = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const tactile = matchMedia("(pointer: coarse)").matches;
+const portrait = () => innerWidth < innerHeight * .9;
+const pre = document.getElementById("prechargeur");
+const compteur = pre.querySelector(".compteur");
+const plaques = [...pre.querySelectorAll(".plaques i")];
+
+/* ─── Lenis ─── */
+let lenis = null;
+if (gsap && window.Lenis && !reduit) {
+  lenis = new Lenis({duration:.9, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))}); window.lenisSite = lenis;
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add(t=>lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0);
+  document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{
+    const id=a.getAttribute("href"); if(id.length>1){e.preventDefault();lenis.scrollTo(id);}
+  }));
+}
+
+/* progression du préchargeur : chaque quart remplit une plaque */
+const prog = {v:0};
+function majPre(){
+  compteur.textContent = Math.round(prog.v);
+  plaques.forEach((p,i)=>{ const k=Math.min(1,Math.max(0,(prog.v-i*25)/25)); p.style.transform="scaleX("+k+")"; });
+}
+function avancerPre(cible, duree){ return gsap ? gsap.to(prog,{v:cible,duration:duree,ease:"power2.inOut",overwrite:true,onUpdate:majPre}) : (prog.v=cible,majPre()); }
+avancerPre(40, 1.2);
+
+/* ─── la feuille : dessinée sur un canevas, séparée en CMJN par le shader ─── */
+async function polices(){
+  try{
+    await Promise.race([
+      Promise.all([document.fonts.load('900 200px "Anybody"'), document.fonts.load('400 40px "Martian Mono"')]),
+      new Promise(r=>setTimeout(r,2600))
+    ]);
+  }catch(e){}
+}
+function dessinerFeuille(port){
+  const W = port ? 1500 : 2400, H = port ? 2100 : 1500;
+  const c = document.createElement("canvas"); c.width=W; c.height=H;
+  const x = c.getContext("2d");
+  const m = port ? 90 : 110;               // marge
+  x.fillStyle="#fff"; x.fillRect(0,0,W,H);
+  // aplats de couleur : chacun ne vit que sur une ou deux plaques
+  x.fillStyle="rgb(255,0,255)";            // magenta pur
+  x.beginPath(); x.arc(port?W*.7:W*.73, port?H*.3:H*.36, port?W*.3:H*.31, 0, Math.PI*2); x.fill();
+  x.fillStyle="rgb(0,255,255)";            // cyan pur
+  x.fillRect(m, port?H*.62:H*.69, port?W*.46:W*.36, port?26:30);
+  x.fillStyle="rgb(255,255,0)";            // jaune pur
+  x.fillRect(port?W-m-150:W-m-190, port?H*.7:H*.6, port?150:190, port?150:190);
+  // le titre, en noir riche
+  x.fillStyle="#000"; x.textBaseline="alphabetic";
+  const lignes = port ? ["IMPRIMÉ","À MONT-","RÉAL."] : ["IMPRIMÉ","À MONTRÉAL."];
+  const maxW = W - m*2;
+  let taille = port ? 520 : 600;
+  const regler = t => { x.font = '900 '+t+'px "Anybody", sans-serif'; if ("fontStretch" in x) x.fontStretch = "ultra-condensed"; };
+  regler(taille);
+  const plusLarge = () => Math.max(...lignes.map(l=>x.measureText(l).width));
+  while (plusLarge() > maxW && taille > 80) { taille -= 8; regler(taille); }
+  const inter = taille * .86;
+  const base0 = port ? H*.18 + taille*.8 : H*.16 + taille*.8;
+  lignes.forEach((l,i)=> x.fillText(l, m-6, base0 + i*inter));
+  // petits textes, traits de coupe, mire et barre de contrôle (en noir : sur les quatre plaques)
+  x.font = '400 '+(port?30:30)+'px "Martian Mono", monospace';
+  x.fillText("PRINTSHOP MTL — ÉPREUVE N° 001", m, m*.62);
+  const droite = "BON À TIRER";
+  x.fillText(droite, W - m - x.measureText(droite).width, m*.62);
+  x.fillText(port ? "VÊTEMENTS · AUTOCOLLANTS" : "VÊTEMENTS · AUTOCOLLANTS · ENSEIGNES · PAPIER PEINT", m, H - m*.45);
+  if (port) x.fillText("ENSEIGNES · PAPIER PEINT", m, H - m*.45 - 44);
+  x.strokeStyle="#000"; x.lineWidth=3;
+  const coin=(cx,cy,sx,sy)=>{ x.beginPath(); x.moveTo(cx+sx*18,cy); x.lineTo(cx+sx*70,cy); x.moveTo(cx,cy+sy*18); x.lineTo(cx,cy+sy*70); x.stroke(); };
+  coin(m*.35,m*.35,1,1); coin(W-m*.35,m*.35,-1,1); coin(m*.35,H-m*.35,1,-1); coin(W-m*.35,H-m*.35,-1,-1);
+  const mire=(cx,cy,r)=>{ x.beginPath(); x.arc(cx,cy,r,0,Math.PI*2); x.moveTo(cx-r*1.5,cy); x.lineTo(cx+r*1.5,cy); x.moveTo(cx,cy-r*1.5); x.lineTo(cx,cy+r*1.5); x.stroke(); };
+  mire(m*.35, H/2, 16); mire(W-m*.35, H/2, 16);
+  // barre de contrôle : C M J N à 100 % puis 50 %
+  const bc = ["rgb(0,255,255)","rgb(255,0,255)","rgb(255,255,0)","#000","rgb(128,255,255)","rgb(255,128,255)","rgb(255,255,128)","#808080"];
+  const bw = port?44:52, bh = port?44:52, bx = W - m - bw*bc.length, by = H - m*.45 - bh + 8;
+  bc.forEach((col,i)=>{ x.fillStyle=col; x.fillRect(bx+i*bw, by, bw, bh); });
+  x.strokeRect(bx, by, bw*bc.length, bh);
+  return {canvas:c, ratio:W/H};
+}
+
+const canvas = document.getElementById("webgl");
+let renderer = null;
+try { renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:"high-performance"}); }
+catch(e){ renderer = null; }
+
+const S = { c:0, m:0, y:0, k:0, reg:1, glisse:0, curl:0, monte:0, tilt:0, loupe:0 };
+
+if (!renderer) {
+  canvas.remove(); document.body.classList.add("sans-gl");
+  avancerPre(100,.6); setTimeout(()=>pre.classList.add("fini"),700);
+} else {
+THREE.ColorManagement.enabled = false;
+renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth<760 ? 1.75 : 2));
+renderer.setSize(innerWidth, innerHeight);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x151413);
+const camera = new THREE.PerspectiveCamera(30, innerWidth/innerHeight, .1, 50);
+camera.position.set(0, 0, 5);
+
+await polices();
+avancerPre(70, .6);
+let feuille = dessinerFeuille(portrait());
+const tex = new THREE.CanvasTexture(feuille.canvas);
+tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter; tex.generateMipmaps = false;
+tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+const vert = /* glsl */`
+uniform float uCurl, uTime, uH;
+varying vec2 vUv; varying float vOmbre;
+void main(){
+  vUv = uv;
+  vec3 p = position;
+  // la feuille respire un peu, comme posée sur la presse
+  p.z += sin(p.x*2.1 + uTime*.7)*.012 + sin(p.y*3.3 + uTime*.5)*.008;
+  // enroulement par le bas : la feuille sort de la presse
+  float R = .11;
+  float yc = mix(-uH*.5 - .02, uH*.5 + 6.2831*R, uCurl);
+  float th = max(0., (yc - p.y)/R);
+  vOmbre = 1.;
+  if (p.y < yc) {
+    p.y = yc - R*sin(th);
+    p.z += R*(1. - cos(th));
+    vOmbre = .55 + .45*cos(th);
+  }
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.);
+}`;
+
+const frag = /* glsl */`
+uniform sampler2D uTex;
+uniform vec4 uPasse;      // avancement de chaque plaque : c, m, j, n
+uniform float uReg;       // 1 = plaques décalées, 0 = repérage parfait
+uniform float uFreq;      // cellules de trame par hauteur de feuille
+uniform float uAspect;
+uniform vec2 uSouris;     // en coordonnées de feuille
+uniform float uLoupe;
+uniform float uTime;
+varying vec2 vUv; varying float vOmbre;
+
+vec2 rot(vec2 p, float a){ float c=cos(a), s=sin(a); return vec2(c*p.x - s*p.y, s*p.x + c*p.y); }
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
+float bruit(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
+
+// séparation CMJN avec un retrait partiel du noir : le noir du titre se construit passe après passe
+vec4 cmjn(vec3 rgb){
+  float k = 1. - max(max(rgb.r, rgb.g), rgb.b);
+  float K = k*.7;
+  vec3 cmy = (1. - rgb - K) / max(1. - K, .001);
+  return vec4(clamp(cmy, 0., 1.), K);
+}
+
+// une plaque : trame de points tournée, encrée par un rouleau qui descend la feuille
+float plaque(vec2 uv, float ang, vec4 canal, float passe, vec2 dec){
+  vec2 asp = vec2(uAspect, 1.);
+  vec2 st = rot((uv - dec)*asp*uFreq, ang);
+  vec2 cellule = floor(st) + .5;
+  vec2 src = rot(cellule, -ang)/uFreq/asp;
+  float v = dot(cmjn(texture2D(uTex, clamp(src, .001, .999)).rgb), canal);
+  float front = 1.08 - passe*1.2;
+  v *= smoothstep(front, front + .07, src.y);
+  float d = length(fract(st) - .5);
+  float r = sqrt(v)*.74;
+  float aa = length(fwidth(st))*.6 + .002;
+  return 1. - smoothstep(r - aa, r + aa, d);
+}
+
+void main(){
+  vec2 uv = vUv;
+  if (!gl_FrontFacing) { gl_FragColor = vec4(vec3(.86,.84,.8)*vOmbre, 1.); return; }
+  // compte-fils : un disque qui grossit la trame cinq fois
+  vec2 asp = vec2(uAspect, 1.);
+  float md = length((uv - uSouris)*asp);
+  float R = .1;
+  float dedans = uLoupe * (1. - smoothstep(R - .002, R, md));
+  vec2 suv = mix(uv, uSouris + (uv - uSouris)/5., step(.5, dedans));
+
+  vec2 oc = vec2(-.014, .009)*uReg, om = vec2(.012, -.007)*uReg, oj = vec2(.005, .013)*uReg;
+  float c = plaque(suv, .2618, vec4(1,0,0,0), uPasse.x, oc);
+  float m = plaque(suv, 1.309, vec4(0,1,0,0), uPasse.y, om);
+  float j = plaque(suv, 0.,    vec4(0,0,1,0), uPasse.z, oj);
+  float n = plaque(suv, .7854, vec4(0,0,0,1), uPasse.w, vec2(0.));
+
+  // papier non couché : fibres et légère variation
+  vec3 col = vec3(.958, .944, .915);
+  col *= 1. - .035*bruit(suv*vec2(900., 60.)) - .02*bruit(suv*40.);
+  // encres en surimpression (multiplication), avec un peu d'engraissement
+  col *= mix(vec3(1.), vec3(0., .66, .93), c*.96);
+  col *= mix(vec3(1.), vec3(.93, 0., .54), m*.96);
+  col *= mix(vec3(1.), vec3(1., .94, 0.), j*.96);
+  col *= mix(vec3(1.), vec3(.09, .09, .1), n);
+
+  // reflet du rouleau sur le front de la plaque en cours
+  float enCours = uPasse.x < 1. ? uPasse.x : (uPasse.y < 1. ? uPasse.y : (uPasse.z < 1. ? uPasse.z : uPasse.w));
+  float front = 1.08 - enCours*1.2;
+  float q = (uv.y - front - .035)*55.;
+  float reflet = exp(-q*q) * step(.001, enCours) * step(enCours, .999);
+  col += reflet*.12;
+
+  // bord du compte-fils et graduation
+  float anneau = (1. - smoothstep(.0015, .004, abs(md - R))) * uLoupe;
+  float grad = step(.5, dedans) * (1. - smoothstep(.0008, .0022, abs(uv.y - uSouris.y))) * step(abs(uv.x - uSouris.x)*uAspect, R*.7) * .5;
+  col = mix(col, vec3(.08), max(anneau, grad));
+  col *= vOmbre;
+  gl_FragColor = vec4(col, 1.);
+}`;
+
+const H = 1;
+let geo = new THREE.PlaneGeometry(feuille.ratio*H, H, 160, 100);
+const mat = new THREE.ShaderMaterial({
+  vertexShader: vert, fragmentShader: frag, side: THREE.DoubleSide,
+  uniforms: {
+    uTex:{value:tex}, uPasse:{value:new THREE.Vector4()}, uReg:{value:1}, uFreq:{value:90}, uAspect:{value:feuille.ratio},
+    uSouris:{value:new THREE.Vector2(-1,-1)}, uLoupe:{value:0}, uTime:{value:0}, uCurl:{value:0}, uH:{value:H}
+  }
+});
+const plan = new THREE.Mesh(geo, mat);
+const groupe = new THREE.Group(); groupe.add(plan); scene.add(groupe);
+
+// ombre portée douce sous la feuille
+const ombre = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.ShaderMaterial({
+  transparent:true, depthWrite:false,
+  uniforms:{uO:{value:.55}},
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+  fragmentShader:`uniform float uO; varying vec2 vUv; void main(){ vec2 d=abs(vUv-.5)*2.; float a=(1.-smoothstep(.55,1.,d.x))*(1.-smoothstep(.45,1.,d.y)); gl_FragColor=vec4(0.,0.,0.,a*uO); }`
+}));
+ombre.position.set(.06, -.08, -.12); groupe.add(ombre);
+
+// cadrage : la feuille occupe ~64 % de la hauteur, ou ~86 % de la largeur sur téléphone
+function cadrer(){
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  const hVis = 2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z;
+  const wVis = hVis*camera.aspect;
+  const ech = Math.min(hVis*.64/H, wVis*.86/(feuille.ratio*H));
+  groupe.scale.setScalar(ech);
+  ombre.scale.set(feuille.ratio*H*1.08, H*1.1, 1);
+  const pxH = ech*H/hVis*innerHeight;            // hauteur de la feuille à l'écran, en px
+  mat.uniforms.uFreq.value = Math.max(48, pxH/6.2);
+}
+cadrer();
+let estPortrait = portrait();
+addEventListener("resize",()=>{
+  if (portrait() !== estPortrait) {          // on redessine la feuille dans l'autre sens
+    estPortrait = portrait(); feuille = dessinerFeuille(estPortrait);
+    tex.image = feuille.canvas; tex.needsUpdate = true;
+    plan.geometry.dispose(); plan.geometry = new THREE.PlaneGeometry(feuille.ratio*H, H, 160, 100);
+    mat.uniforms.uAspect.value = feuille.ratio;
+  }
+  cadrer();
+});
+
+// souris → coordonnées de la feuille (pour le compte-fils et l'inclinaison)
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(9,9);
+let loupeCible = 0;
+addEventListener("pointermove",e=>{ if(e.pointerType!=="mouse") return; ndc.set(e.clientX/innerWidth*2-1, -(e.clientY/innerHeight)*2+1); });
+document.addEventListener("mouseleave",()=>ndc.set(9,9));
+
+/* ─── tirage piloté par le défilement ─── */
+const ch = id=>document.getElementById(id);
+const instrument = { passe:ch("i-passe"), encre:ch("i-encre"), angle:ch("i-angle"), rep:ch("i-rep"), pastille:ch("i-pastille") };
+const encres = [["Cyan","15°","#00AEEF"],["Magenta","75°","#EC008C"],["Jaune","0°","#FFF200"],["Noir","45°","#F2EFE8"]];
+if (gsap) {
+  gsap.set(["#ch1","#ch2","#ch3"],{autoAlpha:0});
+  const tl = gsap.timeline({defaults:{ease:"none"}, scrollTrigger:{trigger:"#recit",start:"top top",end:"bottom bottom",scrub:.6}});
+  tl.addLabel("a",0)
+    .to("#ch0",{autoAlpha:0,y:-30,duration:.5},"a+=.3")
+    .to(S,{m:1,duration:2,ease:"power1.inOut"},"a+=.2")
+    .to("#ch1",{autoAlpha:1,duration:.4},"a+=.6")
+    .from("#ch1 .ligne > span",{yPercent:110,duration:.6,stagger:.12,ease:"power3.out"},"a+=.6")
+    .to("#ch1",{autoAlpha:0,duration:.4},"a+=2.1")
+    .addLabel("b","a+=2.3")
+    .to(S,{y:1,duration:1.5,ease:"power1.inOut"},"b")
+    .to(S,{k:1,duration:1.5,ease:"power1.inOut"},"b+=1.2")
+    .to("#ch2",{autoAlpha:1,duration:.4},"b+=.3")
+    .from("#ch2 .ligne > span",{yPercent:110,duration:.6,stagger:.12,ease:"power3.out"},"b+=.3")
+    .to(S,{reg:0,duration:1.6,ease:"power2.inOut"},"b+=1.4")
+    .to("#ch2",{autoAlpha:0,duration:.4},"b+=2.8")
+    .addLabel("c","b+=3.1")
+    .to(S,{curl:1,monte:1,duration:2,ease:"power2.in"},"c")
+    .to("#instrument",{autoAlpha:0,duration:.4},"c")
+    .to("#ch3",{autoAlpha:1,duration:.3},"c+=1.1")
+    .from("#ch3 .ligne > span",{yPercent:110,duration:.7,stagger:.1,ease:"power3.out"},"c+=1.1")
+    .from("#ch3 .actions",{autoAlpha:0,y:20,duration:.5},"c+=1.6")
+    .to({}, {duration:.6});
+}
+
+// la boucle de rendu ne tourne que tant que la feuille peut être vue
+let visible = true, lance = false;
+if (ScrollTrigger) ScrollTrigger.create({trigger:"#catalogue",start:"top top",onEnter:()=>visible=false,onLeaveBack:()=>{visible=true;boucle();}});
+const horloge = new THREE.Clock();
+let vitesse = 0;
+function boucle(){
+  if (lance) return; lance = true;
+  requestAnimationFrame(function f(){
+    if (!visible || document.hidden) { lance = false; return; }
+    const t = horloge.getElapsedTime();
+    // la vitesse de défilement fait glisser les plaques, comme une presse qui s'emballe
+    const v = lenis ? Math.abs(lenis.velocity||0) : 0;
+    vitesse += (Math.min(1, v/45) - vitesse)*.08;
+    const reg = Math.min(1.4, S.reg + vitesse*.55);
+    mat.uniforms.uPasse.value.set(S.c, S.m, S.y, S.k);
+    mat.uniforms.uReg.value = reg;
+    mat.uniforms.uCurl.value = S.curl;
+    mat.uniforms.uTime.value = t;
+    // compte-fils
+    let surFeuille = false;
+    if (!tactile && ndc.x < 2 && S.curl < .05) {
+      ray.setFromCamera(ndc, camera);
+      const hit = ray.intersectObject(plan, false)[0];
+      if (hit && hit.uv) { mat.uniforms.uSouris.value.lerp(hit.uv, .35); surFeuille = true; }
+    }
+    loupeCible = surFeuille ? 1 : 0;
+    S.loupe += (loupeCible - S.loupe)*.15;
+    mat.uniforms.uLoupe.value = S.loupe > .02 ? S.loupe : 0;
+    // pose de la feuille : légère inclinaison qui suit la souris, envol à la fin
+    const mx = ndc.x < 2 ? ndc.x : 0, my = ndc.y < 2 ? ndc.y : 0;
+    S.tilt += ((tactile?0:1) - S.tilt)*.05;
+    groupe.rotation.x = -.16 + my*.05*S.tilt - S.monte*.5;
+    groupe.rotation.y = mx*.07*S.tilt;
+    groupe.rotation.z = .025 - S.monte*.08;
+    groupe.position.y = (portrait()? .12 : .05) + S.monte*2.4 + Math.sin(t*.6)*.01;
+    groupe.position.z = -S.monte*.6;
+    ombre.material.uniforms.uO.value = .55*(1 - S.curl);
+    // instrument
+    const p = [S.c, S.m, S.y, S.k];
+    let i = p.findIndex(x=>x < .999); if (i < 0) i = 3;
+    instrument.passe.textContent = "Passe " + String(i+1).padStart(2,"0") + " / 04";
+    instrument.encre.textContent = encres[i][0];
+    instrument.angle.textContent = encres[i][1];
+    instrument.pastille.style.background = encres[i][2];
+    instrument.rep.textContent = "±" + (reg*.6).toFixed(2).replace(".", ",") + " mm";
+    renderer.render(scene, camera);
+    requestAnimationFrame(f);
+  });
+}
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && visible) boucle(); });
+
+/* ─── entrée : préchargeur, puis la première passe s'imprime d'elle-même ─── */
+const consigne = document.getElementById("consigne"), preEtat = document.getElementById("pre-etat");
+const ecrireConsigne = txt=>{ consigne.innerHTML=txt.split(" ").map(m=>'<span class="mot">'+[...m].map(c=>'<span class="l">'+c+'</span>').join("")+'</span>').join(" "); return consigne.querySelectorAll(".l"); };
+let entre = false;
+function entrer(){
+  if (entre) return; entre = true;
+  pre.classList.add("fini");
+  ScrollTrigger && ScrollTrigger.refresh();
+  if (!gsap || reduit) { S.c = 1; return; }
+  gsap.to(S,{c:1,duration:2.2,ease:"power2.inOut",delay:.35});
+  gsap.from("#entete, #instrument, #defile",{autoAlpha:0,duration:1,delay:.9});
+  gsap.from("#ch0 > *",{y:24,autoAlpha:0,duration:1,stagger:.12,ease:"expo.out",delay:1.1});
+}
+boucle();
+const fin = avancerPre(100, .8);
+const pret = ()=>{
+  pre.classList.add("pret"); preEtat.textContent = "Plaques calées";
+  const ls = ecrireConsigne(tactile ? "Glissez pour entrer" : "Défilez pour entrer");
+  if (gsap) gsap.fromTo(ls,{fontVariationSettings:'"wdth" 150,"wght" 200',opacity:.2},{fontVariationSettings:'"wdth" 62,"wght" 850',opacity:1,stagger:.025,duration:.6,ease:"power2.out"});
+  ["wheel","touchstart","keydown","click"].forEach(ev=>addEventListener(ev,entrer,{once:true,passive:true}));
+  setTimeout(entrer, 1600);
+};
+if (fin && fin.eventCallback) fin.eventCallback("onComplete", pret); else pret();
+}
+</script>
+</body>
+</html>
