@@ -49,12 +49,13 @@ a{color:inherit}
 .barre i{display:block;height:100%;width:0;background:var(--porcelaine);transition:width .25s}
 
 /* en-tête : texte seul, qui change de couleur selon le fond */
-header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:22px var(--g);mix-blend-mode:difference;color:#fff}
+header{position:fixed;top:0;left:0;right:0;z-index:20;transition:transform .45s cubic-bezier(.65,0,.35,1);display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:22px var(--g);mix-blend-mode:difference;color:#fff}
 .marque{font-family:var(--serif);font-size:1.25rem;font-weight:400;text-decoration:none;letter-spacing:-.01em}
 nav{display:flex;gap:clamp(16px,2.4vw,40px);align-items:baseline;font-size:.92rem}
 nav a{text-decoration:none;position:relative}
 nav a::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s cubic-bezier(.7,0,.2,1)}
 nav a:hover::after{transform:scaleX(1);transform-origin:left}
+header.cache{transform:translateY(-110%)}
 @media (max-width:760px){nav a.lien{display:none}}
 
 main{position:relative;z-index:1}
@@ -101,7 +102,9 @@ main{position:relative;z-index:1}
 .ouverture p{max-width:36ch;font-size:clamp(1rem,1.3vw,1.2rem);color:var(--encre-douce)}
 .soin{width:clamp(300px,34vw,560px);border-left:1px solid var(--trait);gap:clamp(18px,3vh,32px)}
 .photo{position:relative;overflow:hidden;flex:1;min-height:0;background:#d9dfdc}
-.photo img{position:absolute;inset:-6% -8%;width:116%;height:112%;object-fit:cover;filter:saturate(.78) contrast(1.03);will-change:transform}
+.photo img{position:absolute;inset:-6% -8%;width:116%;height:112%;object-fit:cover;filter:grayscale(.25) contrast(1.18) brightness(.97);will-change:transform}
+.voile{position:absolute;inset:-14%;filter:url(#encre);pointer-events:none;z-index:1}
+.voile i{position:absolute;inset:0;background:var(--fond,var(--porcelaine));will-change:transform}
 .photo figcaption{position:absolute;left:12px;bottom:10px;font-size:.72rem;color:rgba(255,255,255,.85);text-shadow:0 1px 6px rgba(0,0,0,.4)}
 .ouverture{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:clamp(24px,4vw,70px)}
 .ouverture .texte{display:flex;flex-direction:column;justify-content:space-between}
@@ -123,7 +126,10 @@ main{position:relative;z-index:1}
 .temoin .photo{height:min(78vh,760px);flex:none}
 @media (max-width:760px){.temoin{grid-template-columns:1fr}.temoin .photo{height:62vh;order:-1}}
 .temoin blockquote{font-family:var(--serif);font-weight:300;font-size:clamp(2.2rem,5.4vw,5.8rem);line-height:1;letter-spacing:-.03em;max-width:16ch}
-.temoin blockquote .mot{color:rgba(19,32,28,.14);transition:none}
+.temoin blockquote .mot{color:rgba(237,240,238,.13);transition:none}
+.sombre{background:var(--encre)!important;color:var(--porcelaine)!important;--fond:var(--encre)}
+.sombre footer,.sombre .autres small,.sombre .note small{color:var(--brume)!important}
+.sombre .note{color:var(--porcelaine)!important}
 .temoin footer{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-top:clamp(36px,7vh,80px);font-size:1rem;color:var(--encre-douce)}
 .temoin .note{font-family:var(--serif);font-size:clamp(3rem,7vw,7rem);line-height:.8;color:var(--encre);letter-spacing:-.04em}
 .temoin .note small{font-family:var(--sans);font-size:1rem;letter-spacing:0;color:var(--encre-douce);margin-left:10px}
@@ -166,16 +172,42 @@ main{position:relative;z-index:1}
 @keyframes pousse{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 .avancer .progres{width:clamp(60px,9vw,120px);height:2px;background:rgba(237,240,238,.18);border-radius:2px;overflow:hidden}
 .avancer .progres i{display:block;height:100%;width:100%;background:var(--porcelaine);transform-origin:left;transform:scaleX(0)}
+/* grain de film sur toute la page : donne de la matière aux aplats */
+body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;opacity:.09;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.25 -.1'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}100%{transform:translate(0,0)}}
+.clair{background-image:radial-gradient(120% 90% at 85% 10%,rgba(255,255,255,.55),transparent 60%),radial-gradient(90% 80% at 0% 100%,rgba(19,32,28,.07),transparent 60%)}
+/* transition en pixels (référence : Atelier North, Codrops, oct. 2026) */
+.pixels{position:relative;z-index:2;height:42vh;display:grid;grid-template-columns:repeat(var(--cols),1fr);grid-template-rows:repeat(6,1fr);margin-top:-42vh;pointer-events:none}
+.pixels i{background:var(--porcelaine);opacity:0;margin:-1px}
+.pixels i.vif{background:var(--gencive)}
+/* texte « instrument » (référence : Heron, Awwwards SOTD 12 oct. 2026) */
+.instrument{position:absolute;left:var(--g);top:96px;font-size:.74rem;line-height:1.5;color:var(--brume);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.instrument b{color:var(--porcelaine);font-weight:500}
+@media (max-width:760px){.instrument{display:none}}
+/* curseur carré à traînée (référence : Heron) */
+#curseur{position:fixed;inset:0;z-index:45;pointer-events:none}
+@media (pointer:coarse){#curseur{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 
 <div id="prechargeur" aria-hidden="true"><div class="compteur">0</div><div class="barre"><i></i></div></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="encre" x="-20%" y="-20%" width="140%" height="140%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.045 0.055" numOctaves="4" seed="7" result="bruit"/>
+    <feDisplacementMap in="SourceGraphic" in2="bruit" scale="100" xChannelSelector="R" yChannelSelector="G" result="deplace"/>
+    <feGaussianBlur in="deplace" stdDeviation="1.8" result="flou"/>
+    <feComponentTransfer in="flou"><feFuncA type="linear" slope="2.2" intercept="-0.6"/></feComponentTransfer>
+  </filter>
+</svg>
 <canvas id="webgl" aria-hidden="true"></canvas>
+<canvas id="curseur" aria-hidden="true"></canvas>
 <div class="avancer" id="avancer" aria-hidden="true"><span>Défilez pour avancer</span><span class="fleche"></span><span class="progres"><i></i></span></div>
 
-<header>
+<header id="entete">
   <a class="marque" href="#">Langelier</a>
   <nav aria-label="Navigation principale">
     <a class="lien" href="#soins">Soins</a>
@@ -208,9 +240,11 @@ main{position:relative;z-index:1}
       <div class="etiquette" data-a="dentine"><i></i><span><b>Dentine</b><small>Le cœur de la dent</small></span></div>
       <div class="etiquette pulpe" data-a="pulpe"><i></i><span><b>Pulpe et canaux</b><small>Ce qu’on soigne lors d’un canal</small></span></div>
       <span class="defile" id="defile">Défilez</span>
+      <div class="instrument" id="instrument"><b>Dent 36</b> · première molaire inférieure gauche<br><span id="mesure">Balayage 0 %</span></div>
     </div>
   </section>
 
+  <div class="pixels" id="pixels" aria-hidden="true"></div>
   <!-- 2. horizontal, les soins -->
   <section class="clair horiz" id="soins" aria-label="Nos soins">
     <div class="piste">
@@ -249,7 +283,7 @@ main{position:relative;z-index:1}
   </section>
 
   <!-- 3. vertical, la phrase qui se remplit -->
-  <section class="clair temoin" id="avis" aria-label="Avis">
+  <section class="clair temoin sombre" id="avis" aria-label="Avis">
     <div class="cote-texte">
     <blockquote id="phrase">Des parents, leurs enfants et maintenant leurs petits-enfants, soignés par la même clinique.</blockquote>
     <footer>
@@ -321,6 +355,39 @@ main{position:relative;z-index:1}
 (function(){
   const gsap=window.gsap; if(!gsap) return;
   gsap.registerPlugin(ScrollTrigger);
+  // voile d'encre posé sur chaque photo
+  function voile(ph){ const v=document.createElement("div"); v.className="voile"; v.innerHTML="<i></i>"; ph.appendChild(v); return v.querySelector("i"); }
+
+  // transition en pixels entre la scène sombre et les soins
+  const px=document.getElementById("pixels"), cols=innerWidth<760?10:25, probas=[.1,.2,.5,.7,1,1];
+  px.style.setProperty("--cols",cols);
+  const choisis=[];
+  for(let r=0;r<6;r++) for(let c=0;c<cols;c++){ const i=document.createElement("i"); px.appendChild(i); if(Math.random()<probas[r]) choisis.push(i); }
+  gsap.utils.shuffle(choisis.filter((_,k)=>k<choisis.length*.55)).slice(0,6).forEach(i=>i.classList.add("vif"));
+  gsap.to(gsap.utils.shuffle(choisis),{opacity:1,duration:.05,stagger:.003,ease:"none",scrollTrigger:{trigger:px,start:"top bottom",end:"bottom bottom",scrub:true}});
+
+  // en-tête qui se cache en descendant et revient en remontant
+  const ent=document.getElementById("entete"); let dernier=0;
+  ScrollTrigger.create({start:0,end:"max",onUpdate:st=>{ const y=st.scroll(); ent.classList.toggle("cache", y>dernier && y>200); dernier=y; }});
+
+  // curseur : point carré de 9 px, traînée selon la vitesse
+  const cv=document.getElementById("curseur");
+  if(!matchMedia("(pointer: coarse)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches){
+    const cx=cv.getContext("2d"), dpr=Math.min(devicePixelRatio,2);
+    const taille=()=>{cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;}; taille(); addEventListener("resize",taille);
+    const cible={x:-50,y:-50}, pos={x:-50,y:-50}, trace=[];
+    addEventListener("mousemove",e=>{cible.x=e.clientX;cible.y=e.clientY;});
+    gsap.ticker.add(()=>{
+      const ax=pos.x, ay=pos.y;
+      pos.x+=(cible.x-pos.x)*.18; pos.y+=(cible.y-pos.y)*.18;
+      const vit=Math.hypot(pos.x-ax,pos.y-ay);
+      trace.push({x:pos.x,y:pos.y,v:vit}); if(trace.length>14) trace.shift();
+      cx.setTransform(dpr,0,0,dpr,0,0); cx.clearRect(0,0,innerWidth,innerHeight);
+      cx.globalCompositeOperation="difference";
+      trace.forEach((p,i)=>{ if(p.v<2) return; const a=i/trace.length, t=3+6*a; cx.fillStyle=`rgba(255,255,255,${a*.5})`; cx.fillRect(p.x-t/2,p.y-t/2,t,t); });
+      cx.fillStyle="#fff"; cx.fillRect(pos.x-4.5,pos.y-4.5,9,9);
+    });
+  }
   document.querySelectorAll(".horiz").forEach(sec=>{
     const piste=sec.querySelector(".piste");
     const dist=()=>Math.max(0,piste.scrollWidth-innerWidth);
@@ -329,11 +396,12 @@ main{position:relative;z-index:1}
     sec.querySelectorAll(".barre-h").forEach(b=>{
       gsap.from(b,{scaleY:0,ease:"power3.out",duration:1,scrollTrigger:{trigger:b.closest(".jour"),containerAnimation:tw,start:"left 85%"}});
     });
-    // photos : rideau qui s'ouvre puis léger glissement de l'image dans son cadre
+    // photos : le voile se retire avec un bord d'encre qui bave, puis l'image glisse dans son cadre
     sec.querySelectorAll(".photo").forEach(ph=>{
       const img=ph.querySelector("img");
-      gsap.fromTo(ph,{clipPath:"inset(100% 0% 0% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",ease:"power3.inOut",duration:1.2,
-        scrollTrigger:{trigger:ph,containerAnimation:tw,start:"left 92%"}});
+      const dejaVisible = ph.getBoundingClientRect().left < innerWidth*.88;
+      gsap.to(voile(ph),{yPercent:-135,ease:"power2.inOut",duration:1.5,
+        scrollTrigger: dejaVisible ? {trigger:sec,start:"top 35%"} : {trigger:ph,containerAnimation:tw,start:"left 88%"}});
       gsap.fromTo(img,{xPercent:6},{xPercent:-6,ease:"none",scrollTrigger:{trigger:ph,containerAnimation:tw,start:"left right",end:"right left",scrub:true}});
     });
     // indicateur « Défilez pour avancer » tant que la piste est épinglée
@@ -346,9 +414,9 @@ main{position:relative;z-index:1}
     });
   });
   const phAvis=document.querySelector("#avis .photo");
-  gsap.fromTo(phAvis,{clipPath:"inset(0% 0% 100% 0%)"},{clipPath:"inset(0% 0% 0% 0%)",ease:"power3.inOut",duration:1.3,scrollTrigger:{trigger:phAvis,start:"top 80%"}});
+  gsap.to(voile(phAvis),{yPercent:-135,ease:"power2.inOut",duration:1.6,scrollTrigger:{trigger:phAvis,start:"top 75%"}});
   gsap.fromTo(phAvis.querySelector("img"),{yPercent:-5},{yPercent:5,ease:"none",scrollTrigger:{trigger:phAvis,start:"top bottom",end:"bottom top",scrub:true}});
-  gsap.to("#phrase .mot",{color:"#13201C",stagger:.1,ease:"none",scrollTrigger:{trigger:"#avis",start:"top 70%",end:"center 45%",scrub:1}});
+  gsap.to("#phrase .mot",{color:"#EDF0EE",stagger:.1,ease:"none",scrollTrigger:{trigger:"#avis",start:"top 70%",end:"center 45%",scrub:1}});
 })();
 </script>
 
@@ -399,12 +467,12 @@ renderer.toneMappingExposure = 1.05;
 renderer.localClippingEnabled = true;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0B2224);
+scene.background = new THREE.Color(0x061416);
 const camera = new THREE.PerspectiveCamera(28, innerWidth/innerHeight, 0.1, 100);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 pmrem.dispose();
-const rim = new THREE.DirectionalLight(0xbfe6ff, 2.2); rim.position.set(-3,4,-4); scene.add(rim);
+const rim = new THREE.DirectionalLight(0xbfe6ff, 3.2); rim.position.set(-3,4,-4); scene.add(rim);
 const fill = new THREE.DirectionalLight(0xffd6cf, 1.0); fill.position.set(4,1,3); scene.add(fill);
 
 /* décor typographique dans la scène, réfracté par l’émail */
@@ -427,13 +495,29 @@ document.fonts && document.fonts.load('300 100px Newsreader').then(()=>{ decor.m
 /* trois couches anatomiques, coupées au défilement */
 const coupeEmail = new THREE.Plane(new THREE.Vector3(0,0,-1), 4);
 const coupeDentine = new THREE.Plane(new THREE.Vector3(0,0,-1), 4);
+// scanner intra-oral : tout ce qui est au-dessus de la ligne de balayage devient nuage de points (référence : Lidar Drone Scanning, Riotters, SOTD 6 oct. 2026)
+const balayage = new THREE.Plane(new THREE.Vector3(0,-1,0), 9);
+const uBal = {value:9};
+const pointsMat = new THREE.ShaderMaterial({
+  transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, toneMapped:false,
+  uniforms:{uBal, uTaille:{value:2.2*Math.min(devicePixelRatio,2)}},
+  vertexShader:`uniform float uBal,uTaille;varying float vH;varying float vD;
+    void main(){vec4 w=modelMatrix*vec4(position,1.);vH=w.y-uBal;vec4 mv=viewMatrix*w;vD=-mv.z;
+      gl_PointSize=uTaille*(1.+.9*exp(-vH*vH*60.))*(6./vD);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`varying float vH;varying float vD;
+    void main(){if(vH<0.)discard;vec2 c=gl_PointCoord-.5;if(dot(c,c)>.25)discard;
+      float pres=exp(-vH*vH*60.);vec3 col=mix(vec3(.62,.86,.86),vec3(1.,.72,.71),pres);
+      gl_FragColor=vec4(col*(.55+1.6*pres),.75);}`
+});
+const anneau = new THREE.Mesh(new THREE.RingGeometry(.98,1.0,96), new THREE.MeshBasicMaterial({color:0xFF9D9B, transparent:true, opacity:0, side:THREE.DoubleSide, toneMapped:false, blending:THREE.AdditiveBlending, depthWrite:false}));
+anneau.rotation.x = -Math.PI/2;
 const email = new THREE.MeshPhysicalMaterial({
   color:0xFFFFFF, roughness:0.08, transmission:0.92, thickness:1.1, ior:1.62, dispersion:1.4,
   attenuationColor:new THREE.Color(0xEFE4D2), attenuationDistance:1.6,
-  clearcoat:1, clearcoatRoughness:0.04, envMapIntensity:1.3, side:THREE.DoubleSide, clippingPlanes:[coupeEmail]
+  clearcoat:1, clearcoatRoughness:0.04, envMapIntensity:1.6, side:THREE.DoubleSide, clippingPlanes:[coupeEmail, balayage]
 });
-const dentine = new THREE.MeshPhysicalMaterial({ color:0xE9D6B0, roughness:0.45, sheen:0.5, sheenColor:new THREE.Color(0xFFF1D6), side:THREE.DoubleSide, clippingPlanes:[coupeDentine] });
-const pulpe = new THREE.MeshPhysicalMaterial({ color:0xD9686A, roughness:0.35, emissive:new THREE.Color(0x8A1E2A), emissiveIntensity:0.55, clearcoat:0.6 });
+const dentine = new THREE.MeshPhysicalMaterial({ color:0xE9D6B0, roughness:0.45, sheen:0.5, sheenColor:new THREE.Color(0xFFF1D6), side:THREE.DoubleSide, clippingPlanes:[coupeDentine, balayage] });
+const pulpe = new THREE.MeshPhysicalMaterial({ color:0xD9686A, roughness:0.35, emissive:new THREE.Color(0x8A1E2A), emissiveIntensity:0.55, clearcoat:0.6, clippingPlanes:[balayage] });
 
 const coucheDent = (mc, k) => {
   const B = (x,y,z,s) => mc.addBall(0.5+x*k[0], 0.5+y, 0.5+z*k[0], s*k[1], 12);
@@ -448,9 +532,17 @@ function maillage(mat, remplir, res=72){
   mc.scale.setScalar(1.75); mc.position.y = -0.1;
   return mc;
 }
+function nuage(mc, pas=2){
+  const n = mc.count, src = mc.positionArray, out = [];
+  for (let i=0;i<n;i+=pas) out.push(src[i*3], src[i*3+1], src[i*3+2]);
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(out,3));
+  const p = new THREE.Points(g, pointsMat); p.frustumCulled = false; return p;
+}
 function dentIntegree(){
   const g = new THREE.Group();
-  g.add(maillage(email, mc => coucheDent(mc,[1,1])));
+  const coque = maillage(email, mc => coucheDent(mc,[1,1]));
+  g.add(coque);
+  coque.add(nuage(coque));
   g.add(maillage(dentine, mc => coucheDent(mc,[.86,.62]), 64));
   g.add(maillage(pulpe, mc => {
     const B = (x,y,z,s) => mc.addBall(0.5+x, 0.5+y, 0.5+z, s, 12);
@@ -459,7 +551,7 @@ function dentIntegree(){
   }, 64));
   return g;
 }
-const stage = new THREE.Group(); scene.add(stage);
+const stage = new THREE.Group(); scene.add(stage); scene.add(anneau);
 let dent = null;
 const manager = new THREE.LoadingManager();
 new GLTFLoader(manager).load("dent.glb",
@@ -474,14 +566,14 @@ composer.setPixelRatio(Math.min(devicePixelRatio,2)); composer.setSize(innerWidt
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 0.4, 0.55, 0.82); composer.addPass(bloom);
 composer.addPass(new ShaderPass({
-  uniforms:{tDiffuse:{value:null},uOffset:{value:.4},uDarkness:{value:.55}},
+  uniforms:{tDiffuse:{value:null},uOffset:{value:.32},uDarkness:{value:.72}},
   vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
   fragmentShader:`uniform sampler2D tDiffuse;uniform float uOffset,uDarkness;varying vec2 vUv;
     void main(){vec4 c=texture2D(tDiffuse,vUv);float v=smoothstep(.85,uOffset,length(vUv-.5));gl_FragColor=vec4(mix(c.rgb*(1.-uDarkness),c.rgb,v),c.a);}`
 }));
 composer.addPass(new OutputPass());
 const grain = new ShaderPass({
-  uniforms:{tDiffuse:{value:null},uTime:{value:0},uI:{value:.035}},
+  uniforms:{tDiffuse:{value:null},uTime:{value:0},uI:{value:.06}},
   vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
   fragmentShader:`uniform sampler2D tDiffuse;uniform float uTime,uI;varying vec2 vUv;
     float r(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
@@ -490,7 +582,7 @@ const grain = new ShaderPass({
 composer.addPass(grain);
 
 /* mise en scène pilotée par le défilement */
-const S = { tx:1.25, ty:0, ech:1, rotY:-.5, rotX:.25, spin:1, orb:0, rayon:7, haut:.15, coupeE:4, coupeD:4, etiq:0 };
+const S = { tx:1.25, ty:0, ech:1, rotY:-.5, rotX:.25, spin:1, orb:0, rayon:7, haut:.15, coupeE:4, coupeD:4, etiq:0, scan:1.6 };
 const L = {}; for (const k in S) L[k] = S[k];
 const souris = {x:0,y:0,lx:0,ly:0};
 if (estMobile()) { Object.assign(S,{tx:0,ty:.75,ech:.55,rayon:7.6}); Object.assign(L,S); }
@@ -510,8 +602,11 @@ if (gsap) {
   tl.to("#defile",{opacity:0,duration:.3},"c1")
     .to(S,{orb:m?.35:-.55, tx:m?0:-1.35, ty:m?.75:.05, rotY:Math.PI*.85, rotX:-.1, rayon:m?7.6:6.4, duration:1.4},"c1");
   entree("ch1").forEach(([t,v])=>tl.to(t,v,"c1+=.7"));
+  // le scanner descend sur la dent pendant « Ce qu'on voit, on vous l'explique »
+  tl.fromTo(S,{scan:1.6},{scan:-1.7, duration:1.3, ease:"none"},"c1+=.5");
   tl.addLabel("c2", "c1+=2.2");
   sortie("ch1").forEach(([t,v])=>tl.to(t,v,"c2"));
+  tl.to(S,{scan:1.6, duration:.7, ease:"power1.inOut"},"c2");
   tl.to(S,{orb:m?0:.25, tx:m?0:1.2, ty:m?-.62:-.1, rotY:Math.PI*2, rotX:.12, spin:0, rayon:m?6.8:5.9, haut:.35, ech:m?.6:1, duration:1},"c2")
     .to(S,{coupeE:.02, duration:.9},"c2+=.6")
     .to(S,{coupeD:.12, duration:.8},"c2+=.95")
@@ -543,6 +638,7 @@ function placerEtiquettes(){
 }
 
 const horloge = new THREE.Clock();
+const mesure = document.getElementById("mesure");
 let spinAcc = 0, enCours = false;
 function boucle(){
   if (enCours) return; enCours = true;
@@ -564,6 +660,12 @@ function boucle(){
     coupeEmail.normal.copy(versCam).negate(); coupeEmail.constant = centre.dot(versCam) + L.coupeE;
     coupeDentine.normal.copy(versCam).negate(); coupeDentine.constant = centre.dot(versCam) + L.coupeD;
     decor.position.set(-Math.sin(ang)*5, .2, -Math.cos(ang)*5); decor.lookAt(camera.position);
+    // ligne de balayage, exprimée en hauteur relative à la dent
+    const yBal = centre.y + L.scan*L.ech; uBal.value = yBal; balayage.constant = yBal;
+    const actifBal = L.scan<1.5 && L.scan>-1.6;
+    anneau.position.set(centre.x, yBal, centre.z); anneau.scale.setScalar(L.ech*(.95-.4*Math.max(0,-L.scan)/1.6));
+    anneau.material.opacity = actifBal ? .85 : 0;
+    if (mesure) mesure.textContent = "Balayage " + Math.round(Math.min(1,Math.max(0,(1.6-L.scan)/3.3))*100) + " %";
     placerEtiquettes();
     grain.uniforms.uTime.value = t;
     composer.render();
