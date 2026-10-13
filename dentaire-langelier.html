@@ -16,7 +16,7 @@
 <meta name="description" content="Clinique dentaire familiale au 7335, boulevard Langelier, Saint-Léonard. Ouvert le soir jeudi et vendredi.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,200..800&display=swap" rel="stylesheet">
 <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -36,22 +36,32 @@
 html,body{overscroll-behavior:none;background:var(--abysse)}
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
-body{color:var(--porcelaine);font-family:var(--sans);font-size:clamp(15px,1vw,17px);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{color:var(--porcelaine);font-family:var(--sans);font-size:clamp(16px,1.12vw,19px);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--gencive);outline-offset:4px}
 #webgl{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 
 /* préchargeur */
-#prechargeur{position:fixed;inset:0;z-index:50;background:var(--abysse);display:flex;flex-direction:column;justify-content:flex-end;padding:var(--g);transition:opacity .8s,visibility .8s}
+#prechargeur{position:fixed;inset:0;z-index:50;background:var(--abysse);display:flex;flex-direction:column;justify-content:space-between;padding:var(--g);transition:opacity .9s,visibility .9s;cursor:pointer}
 #prechargeur.fini{opacity:0;visibility:hidden}
-.compteur{font-family:var(--serif);font-weight:300;font-size:clamp(6rem,24vw,22rem);line-height:.78;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--brume)}
+.pre-haut{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.pre-marque{font-family:var(--serif);font-size:clamp(1.2rem,1.8vw,1.7rem);color:var(--porcelaine)}
+.compteur{font-family:var(--serif);font-weight:300;font-size:clamp(3.4rem,8vw,7.5rem);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--brume)}
+.consigne{display:flex;align-items:center;gap:clamp(18px,3vw,44px)}
+.consigne p{font-family:var(--serif);font-weight:300;font-size:clamp(2.8rem,8.6vw,9.6rem);line-height:.9;letter-spacing:-.04em;max-width:11ch;color:var(--porcelaine)}
+.consigne p .l{display:inline-block;white-space:pre}
+.souris{flex:none;width:clamp(30px,3vw,44px);aspect-ratio:3/5;border:1.5px solid var(--brume);border-radius:999px;position:relative}
+.souris i{position:absolute;left:50%;top:18%;width:3px;height:16%;margin-left:-1.5px;border-radius:2px;background:var(--gencive);animation:molette 1.6s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes molette{0%{transform:translateY(0);opacity:0}25%{opacity:1}80%{transform:translateY(160%);opacity:0}100%{opacity:0}}
+#prechargeur.pret .souris{border-color:var(--porcelaine)}
+.pre-bas{display:flex;justify-content:space-between;gap:20px;color:var(--brume);font-size:.95rem}
 .barre{height:1px;background:rgba(185,204,201,.2);margin-top:28px}
 .barre i{display:block;height:100%;width:0;background:var(--porcelaine);transition:width .25s}
 
 /* en-tête : texte seul, qui change de couleur selon le fond */
 header{position:fixed;top:0;left:0;right:0;z-index:20;transition:transform .45s cubic-bezier(.65,0,.35,1);display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:22px var(--g);mix-blend-mode:difference;color:#fff}
 .marque{font-family:var(--serif);font-size:1.25rem;font-weight:400;text-decoration:none;letter-spacing:-.01em}
-nav{display:flex;gap:clamp(16px,2.4vw,40px);align-items:baseline;font-size:.92rem}
+nav{display:flex;gap:clamp(16px,2.4vw,40px);align-items:baseline;font-size:1rem}
 nav a{text-decoration:none;position:relative}
 nav a::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s cubic-bezier(.7,0,.2,1)}
 nav a:hover::after{transform:scaleX(1);transform-origin:left}
@@ -61,14 +71,20 @@ header.cache{transform:translateY(-110%)}
 main{position:relative;z-index:1}
 
 /* ─── 1. récit vertical sur la scène 3D ─── */
-.recit{height:480vh;position:relative}
+.recit{height:640vh;position:relative}
 .collant{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
 .ch{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:120px var(--g) clamp(34px,6vh,64px);pointer-events:none}
 .ch h1,.ch h2{font-family:var(--serif);font-weight:300;letter-spacing:-.035em;line-height:.9}
 .ch h1{font-size:clamp(2.5rem,8.4vw,9.4rem)}
+.lecteur{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.levres{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.levres text{font-family:var(--serif);fill:var(--porcelaine);letter-spacing:-.025em}
+.levres text.fine{fill:var(--brume)}
 .ch h1 .ligne > span{white-space:nowrap}
-.ch h2{font-size:clamp(2.6rem,6.4vw,6.6rem);max-width:11ch}
-.ch p.suite{margin-top:24px;max-width:34ch;font-size:clamp(1rem,1.25vw,1.15rem);color:var(--brume)}
+.ch h2{font-size:clamp(3.2rem,8.4vw,9.2rem);max-width:10ch;font-variation-settings:"wght" 300}
+.ch h2 .l,.consigne .l,.pied .l{display:inline-block}
+.mot{display:inline-block;white-space:nowrap}
+.ch p.suite{margin-top:26px;max-width:30ch;font-size:clamp(1.15rem,1.6vw,1.5rem);line-height:1.45;color:var(--brume)}
 .ch.droite{align-items:flex-end;text-align:right}
 .ch.haut{justify-content:flex-start;padding-top:clamp(110px,15vh,150px)}
 .ligne{display:block;overflow:hidden;padding:.14em 0 .1em;margin:-.14em 0 -.1em}
@@ -81,7 +97,7 @@ main{position:relative;z-index:1}
 .etiquette{position:absolute;left:0;top:0;display:flex;flex-direction:row-reverse;align-items:center;gap:12px;font-size:.92rem;white-space:nowrap;opacity:0;pointer-events:none;will-change:transform}
 .etiquette::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--porcelaine);box-shadow:0 0 0 6px rgba(237,240,238,.14)}
 .etiquette i{display:block;width:clamp(28px,5vw,80px);height:1px;background:rgba(237,240,238,.55)}
-.etiquette b{font-family:var(--serif);font-weight:400;font-size:1.3rem;display:block;line-height:1.1}
+.etiquette b{font-family:var(--serif);font-weight:400;font-size:1.7rem;display:block;line-height:1.1}
 .etiquette small{display:block;color:var(--brume);font-size:.8rem}
 .etiquette.pulpe::before{background:var(--gencive)}
 @media (max-width:760px){.etiquette{display:none}}
@@ -110,8 +126,8 @@ main{position:relative;z-index:1}
 .ouverture .texte{display:flex;flex-direction:column;justify-content:space-between}
 .salle{width:clamp(320px,42vw,700px);padding:0!important}
 .salle .photo{height:100%}
-.soin h3{font-family:var(--serif);font-weight:300;font-size:clamp(2.2rem,3.6vw,3.8rem);line-height:.95;letter-spacing:-.03em}
-.soin p{max-width:30ch;color:var(--encre-douce);font-size:clamp(1rem,1.15vw,1.1rem)}
+.soin h3{font-family:var(--serif);font-weight:300;font-size:clamp(2.6rem,4.4vw,4.9rem);line-height:.95;letter-spacing:-.03em}
+.soin p{max-width:30ch;color:var(--encre-douce);font-size:clamp(1.1rem,1.35vw,1.3rem)}
 .soin .pour{font-size:.85rem;color:var(--encre-douce);display:flex;justify-content:space-between;gap:16px;padding-top:14px;border-top:1px solid var(--trait);margin-top:28px}
 .soin .pour b{font-weight:500;color:var(--encre)}
 .soin.urgence{background:var(--encre);color:var(--porcelaine);border-left:0}
@@ -125,7 +141,7 @@ main{position:relative;z-index:1}
 .temoin{min-height:100vh;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(28px,5vw,90px);align-items:center;padding:clamp(90px,14vh,160px) var(--g)}
 .temoin .photo{height:min(78vh,760px);flex:none}
 @media (max-width:760px){.temoin{grid-template-columns:1fr}.temoin .photo{height:62vh;order:-1}}
-.temoin blockquote{font-family:var(--serif);font-weight:300;font-size:clamp(2.2rem,5.4vw,5.8rem);line-height:1;letter-spacing:-.03em;max-width:16ch}
+.temoin blockquote{font-family:var(--serif);font-weight:300;font-size:clamp(2.6rem,6.2vw,7rem);line-height:1;letter-spacing:-.03em;max-width:16ch}
 .temoin blockquote .mot{color:rgba(237,240,238,.13);transition:none}
 .sombre{background:var(--encre)!important;color:var(--porcelaine)!important;--fond:var(--encre)}
 .sombre footer,.sombre .autres small,.sombre .note small{color:var(--brume)!important}
@@ -159,7 +175,7 @@ main{position:relative;z-index:1}
 
 /* ─── 5. pied ─── */
 .pied{background:var(--encre);color:var(--brume);padding:clamp(70px,12vh,140px) var(--g) 34px;position:relative;z-index:2}
-.pied a.grand{display:block;font-family:var(--serif);font-weight:300;font-size:clamp(3.2rem,12vw,13rem);line-height:.85;letter-spacing:-.05em;color:var(--porcelaine);text-decoration:none}
+.pied a.grand{display:block;font-family:var(--serif);font-weight:300;font-variation-settings:"wght" 260;font-size:clamp(3.4rem,14vw,15rem);line-height:.85;letter-spacing:-.05em;color:var(--porcelaine);text-decoration:none}
 .pied .ligne-bas{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(50px,9vh,110px);font-size:.85rem}
 .avancer{position:fixed;left:50%;bottom:clamp(18px,3.5vh,34px);z-index:30;transform:translate(-50%,16px);opacity:0;pointer-events:none;
   display:flex;align-items:center;gap:14px;padding:11px 18px 11px 20px;border-radius:999px;background:var(--encre);color:var(--porcelaine);font-size:.88rem;transition:opacity .35s,transform .35s}
@@ -197,7 +213,11 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
 </head>
 <body>
 
-<div id="prechargeur" aria-hidden="true"><div class="compteur">0</div><div class="barre"><i></i></div></div>
+<div id="prechargeur" role="dialog" aria-label="Chargement">
+  <div class="pre-haut"><span class="pre-marque">Centre Dentaire Langelier</span><span class="compteur">0</span></div>
+  <div class="consigne"><span class="souris" aria-hidden="true"><i></i></span><p id="consigne">Défilez pour avancer</p></div>
+  <div><div class="barre"><i></i></div><div class="pre-bas" style="margin-top:14px"><span id="pre-etat">Chargement de la visite</span><span>Saint-Léonard, Montréal</span></div></div>
+</div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <filter id="encre" x="-20%" y="-20%" width="140%" height="140%">
     <feTurbulence type="fractalNoise" baseFrequency="0.045 0.055" numOctaves="4" seed="7" result="bruit"/>
@@ -225,7 +245,8 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
   <section class="recit" id="recit" aria-label="Présentation">
     <div class="collant">
       <div class="ch" id="ch0">
-        <h1><span class="ligne"><span>Trois générations</span></span><span class="ligne"><span>de sourires</span></span><span class="ligne"><span>à Saint&#8209;Léonard.</span></span></h1>
+        <h1 class="lecteur">Centre Dentaire Langelier : trois générations de sourires à Saint-Léonard.</h1>
+        <svg class="levres" id="levres" aria-hidden="true"></svg>
         <div class="reperes">
           <span><b>Centre Dentaire Langelier</b>7335, boulevard Langelier</span>
           <span><b class="etat" id="etat">Horaires</b><span id="etat-detail">Ouvert le soir jeudi et vendredi.</span></span>
@@ -358,6 +379,16 @@ body::after{content:"";position:fixed;inset:-50%;z-index:40;pointer-events:none;
 (function(){
   const gsap=window.gsap; if(!gsap) return;
   gsap.registerPlugin(ScrollTrigger);
+  // découpe en lettres pour les jeux typographiques
+  function lettres(el){ el.innerHTML = el.textContent.split(" ").map(m=>'<span class="mot">'+[...m].map(c=>'<span class="l">'+c+'</span>').join("")+'</span>').join(" "); return el.querySelectorAll(".l"); }
+  document.querySelectorAll("#ch1 .ligne > span, #ch2 .ligne > span").forEach(lettres);
+  // le numéro du pied de page s'épaissit sous le curseur
+  const grand=document.querySelector(".pied a.grand");
+  if(grand && !matchMedia("(pointer: coarse)").matches){
+    const ls=lettres(grand);
+    addEventListener("mousemove",e=>{ ls.forEach(l=>{ const r=l.getBoundingClientRect(); const d=Math.hypot(e.clientX-(r.left+r.width/2), e.clientY-(r.top+r.height/2));
+      l.style.fontVariationSettings='"wght" '+Math.round(200+600*Math.max(0,1-d/320)); }); });
+  }
   // voile d'encre posé sur chaque photo
   function voile(ph){ const v=document.createElement("div"); v.className="voile"; v.innerHTML="<i></i>"; ph.appendChild(v); return v.querySelector("i"); }
 
@@ -585,6 +616,62 @@ function dentIntegree(){
   return g;
 }
 const stage = new THREE.Group(); scene.add(stage); scene.add(anneau);
+
+/* ── le sourire : deux arcades de couronnes et des gencives ── */
+const emailArc = new THREE.MeshPhysicalMaterial({ color:0xFBF8F2, roughness:0.16, clearcoat:1, clearcoatRoughness:0.05, sheen:0.5, sheenColor:new THREE.Color(0xDDF2F2), envMapIntensity:1.5 });
+const gencive = new THREE.MeshPhysicalMaterial({ color:0xC9656A, roughness:0.42, clearcoat:0.5, clearcoatRoughness:0.2, sheen:0.8, sheenColor:new THREE.Color(0xFFC4C4), envMapIntensity:1.1 });
+const formes = {
+  I:(B)=>{ B(-.035,.16,0,.2); B(0,.16,0,.22); B(.035,.16,0,.2); B(-.03,.23,0,.12); B(0,.235,0,.12); B(.03,.23,0,.12); B(0,.08,0,.2); },
+  C:(B)=>{ B(0,.14,0,.3); B(0,.2,0,.2); B(0,.265,0,.07); B(0,.07,0,.22); },
+  P:(B)=>{ B(0,.15,-.03,.28); B(0,.15,.03,.28); B(0,.225,-.04,.15); B(0,.225,.04,.15); B(0,.07,0,.24); },
+  M:(B)=>{ for (const [x,z] of [[-.06,-.05],[.06,-.05],[-.06,.05],[.06,.05],[0,0]]) B(x,.15,z,.42);
+           for (const [x,z] of [[-.075,-.065],[.075,-.065],[-.075,.065],[.075,.065]]) B(x,.235,z,.2); B(0,.06,0,.34); }
+};
+function geoCouronne(type){
+  const mc = new MarchingCubes(48, emailArc, false, false, 40000);
+  mc.isolation = 60; mc.reset(); formes[type]((x,y,z,st)=>mc.addBall(.5+x,.5+y,.5+z,st,12)); mc.update();
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(mc.positionArray.slice(0,mc.count*3),3));
+  g.setAttribute("normal", new THREE.Float32BufferAttribute(mc.normalArray.slice(0,mc.count*3),3));
+  if (type==="I") g.scale(1,1,.55);
+  g.computeBoundingBox(); const c = g.boundingBox.getCenter(new THREE.Vector3()); g.translate(-c.x,-c.y,-c.z); g.computeBoundingBox();
+  mc.geometry.dispose();
+  return g;
+}
+const sourire = new THREE.Group(); scene.add(sourire);
+const dentsSourire = []; let dent36 = null; const pos36 = new THREE.Vector3();
+(function construireSourire(){
+  const geos = {I:geoCouronne("I"), C:geoCouronne("C"), P:geoCouronne("P"), M:geoCouronne("M")};
+  const hauteur = {I:.56, C:.58, P:.48, M:.44};
+  const ordre = ["I","I","C","P","P","M","M"];
+  const R0 = 1.55, ptsHaut = [], ptsBas = [];
+  for (const arc of ["haut","bas"]) for (const cote of [-1,1]) {
+    let s0 = .012;
+    ordre.forEach((t,i)=>{
+      const g = geos[t], h = g.boundingBox.max.y-g.boundingBox.min.y, k = hauteur[t]*(arc==="bas"?.92:1)/h;
+      const larg = (g.boundingBox.max.x-g.boundingBox.min.x)*k*(t==="I"&&i===1?.86:1);
+      const sc = s0 + larg/2; s0 += larg + .018;
+      const th = cote*sc/R0, x = R0*Math.sin(th), z = R0*Math.cos(th)-R0, arcY = .2*Math.pow(Math.sin(th),2);
+      const m = new THREE.Mesh(g, emailArc);
+      m.scale.setScalar(k*(t==="I"&&i===1?.86:1));
+      m.position.set(x, arc==="haut" ? .3+arcY : -.27+arcY, z);
+      m.rotation.set(0, th, arc==="haut" ? Math.PI : 0);
+      sourire.add(m); dentsSourire.push({m, x, y:m.position.y, z, th, arc, rnd:Math.random(), k0:m.scale.x});
+      // 36 : première molaire inférieure gauche du patient, donc à droite pour nous
+      if (arc==="bas" && cote===1 && i===5) dent36 = m;
+      if (i===2) (arc==="haut"?ptsHaut:ptsBas).push(null);
+    });
+  }
+  // gencives : un bourrelet le long de chaque arcade
+  const ligneGencive = (y0)=>{ const pts=[]; for(let i=0;i<=40;i++){ const th=-1.45+2.9*i/40; pts.push(new THREE.Vector3(R0*Math.sin(th), y0+.2*Math.pow(Math.sin(th),2), R0*Math.cos(th)-R0-.04)); } return new THREE.CatmullRomCurve3(pts); };
+  const gH = new THREE.Mesh(new THREE.TubeGeometry(ligneGencive(.63),120,.17,24,false), gencive); gH.scale.set(1,.75,1);
+  const gB = new THREE.Mesh(new THREE.TubeGeometry(ligneGencive(-.6),120,.16,24,false), gencive); gB.scale.set(1,.75,1);
+  sourire.add(gH, gB); sourire.userData.gencives = [gH, gB];
+})();
+sourire.position.set(0,.25,0);
+if (estMobile()) sourire.scale.setScalar(.5);
+sourire.updateMatrixWorld(true);
+dent36.getWorldPosition(pos36);
 let dent = null;
 const manager = new THREE.LoadingManager();
 new GLTFLoader(manager).load("dent.glb",
@@ -617,10 +704,57 @@ const grain = new ShaderPass({
 composer.addPass(grain);
 
 /* mise en scène pilotée par le défilement */
-const S = { tx:1.25, ty:0, ech:1, rotY:-.5, rotX:.25, spin:1, orb:0, rayon:7, haut:.15, coupeE:4, coupeD:4, etiq:0, scan:1.6 };
+const S = { tx:pos36.x, ty:pos36.y, ech:0, rotY:0, rotX:.1, spin:0, orb:0, rayon:7, haut:.15, coupeE:4, coupeD:4, etiq:0, scan:1.6, ecart:0 };
 const L = {}; for (const k in S) L[k] = S[k];
 const souris = {x:0,y:0,lx:0,ly:0};
-if (estMobile()) { Object.assign(S,{tx:0,ty:.75,ech:.55,rayon:7.6}); Object.assign(L,S); }
+if (estMobile()) { S.rayon = 7.6; L.rayon = 7.6; }
+
+/* lèvres de texte : le titre épouse la courbe du sourire, puis se redresse */
+const svg = document.getElementById("levres"), NS="http://www.w3.org/2000/svg";
+const levres = [], etatLevres = {p:0};
+const lerp=(a,b,t)=>a+(b-a)*t;
+function construireLevres(){
+  const W=innerWidth, H=innerHeight, mob=W<760, g=Math.max(18,Math.min(56,W*.036));
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  camera.position.set(0,.15,L.rayon); camera.lookAt(0,0,0); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
+  const v=new THREE.Vector3(0,sourire.position.y,0).project(camera), cy=(-v.y*.5+.5)*H;
+  const lignes = mob
+    ? [{t:"Trois générations",y0:cy-H*.17,creux:H*.09,f:.064},{t:"de sourires",y0:cy+H*.13,creux:H*.07,f:.1},{t:"à Saint\u2011Léonard.",y0:cy+H*.21,creux:H*.1,f:.085}]
+    : [{t:"Trois générations de sourires",y0:cy-H*.3,creux:H*.17,f:.057},{t:"à Saint\u2011Léonard.",y0:cy+H*.2,creux:H*.24,f:.084}];
+  const tD = mob ? W*.118 : Math.min(W*.062,H*.13);
+  if (levres.length !== lignes.length){
+    svg.innerHTML=""; levres.length=0;
+    lignes.forEach((L0,i)=>{
+      const chemin=document.createElementNS(NS,"path"); chemin.setAttribute("id","levre"+i); chemin.setAttribute("fill","none");
+      const texte=document.createElementNS(NS,"text"); texte.setAttribute("font-weight",300);
+      const tp=document.createElementNS(NS,"textPath"); tp.setAttribute("href","#levre"+i); tp.textContent=L0.t;
+      texte.appendChild(tp); svg.append(chemin,texte); levres.push({chemin,texte,tp});
+    });
+  }
+  lignes.forEach((L0,i)=>{
+    const l=levres[i];
+    l.c={x0:W*(mob?.04:.08), y0:L0.y0, xc:W/2, yc:L0.y0+L0.creux*2, x1:W*(mob?.96:.92), y1:L0.y0, fs:W*L0.f};
+    const yd=H*(mob?.6:.58)+i*tD*1.02;
+    l.d={x0:g, y0:yd, xc:W*.8, yc:yd, x1:W*1.6, y1:yd, fs:tD};
+    // centrer le texte sur la courbe
+    l.chemin.setAttribute("d",`M ${l.c.x0} ${l.c.y0} Q ${l.c.xc} ${l.c.yc} ${l.c.x1} ${l.c.y1}`);
+    l.texte.setAttribute("font-size",l.c.fs);
+    l.off=Math.max(0,(l.chemin.getTotalLength()-l.texte.getComputedTextLength())/2);
+  });
+  dessinerLevres();
+}
+function dessinerLevres(){
+  const t=etatLevres.p;
+  levres.forEach(l=>{
+    const k=(n)=>lerp(l.c[n],l.d[n],t);
+    l.chemin.setAttribute("d",`M ${k("x0")} ${k("y0")} Q ${k("xc")} ${k("yc")} ${k("x1")} ${k("y1")}`);
+    l.texte.setAttribute("font-size",k("fs"));
+    l.tp.setAttribute("startOffset",l.off*(1-t));
+  });
+}
+construireLevres();
+addEventListener("resize",construireLevres);
+document.fonts && document.fonts.ready.then(construireLevres);
 
 let visible = true;
 if (gsap) {
@@ -630,10 +764,17 @@ if (gsap) {
   gsap.set([...lignes("ch1"),...lignes("ch2")], {yPercent:135});
   gsap.set(["#ch1 .suite","#ch2 .suite"], {opacity:0, y:20});
   const sortie = id=>[[lignes(id),{yPercent:-135,stagger:.03,duration:.5}],[suites(id),{opacity:0,y:-20,duration:.4}]];
-  const entree = id=>[[lignes(id),{yPercent:0,stagger:.05,duration:.6}],[suites(id),{opacity:1,y:0,duration:.5}]];
+  gsap.set("#ch1 .l, #ch2 .l",{fontVariationSettings:'"wght" 200'});
+  const entree = id=>[[lignes(id),{yPercent:0,stagger:.05,duration:.6}],[document.querySelectorAll(`#${id} .l`),{fontVariationSettings:'"wght" 430',stagger:{each:.012,from:"start"},duration:.35,ease:"power1.out"}],[suites(id),{opacity:1,y:0,duration:.5}]];
   const tl = gsap.timeline({defaults:{ease:"power2.inOut"}, scrollTrigger:{trigger:"#recit",start:"top top",end:"bottom bottom",scrub:1.1}});
-  tl.addLabel("c1", .5);
+  // 0 : le sourire s'ouvre, les lèvres de texte se redressent, la 36 s'avance
+  tl.addLabel("c0", .35);
+  tl.to(S,{ecart:1, duration:1.3, ease:"power2.in"},"c0")
+    .to(S,{ech:m?.55:1, tx:m?0:1.25, ty:m?.75:0, rotY:-.5, rotX:.25, spin:1, duration:1.5, ease:"power3.inOut"},"c0+=.15");
+  tl.to(etatLevres,{p:1,duration:1.1,ease:"power3.inOut",onUpdate:dessinerLevres},"c0");
+  tl.addLabel("c1", "c0+=2.6");
   sortie("ch0").forEach(([t,v])=>tl.to(t,v,"c1"));
+  tl.to("#levres",{opacity:0,y:-60,duration:.6},"c1");
   tl.to("#defile",{opacity:0,duration:.3},"c1")
     .to(S,{orb:m?.35:-.55, tx:m?0:-1.35, ty:m?.75:.05, rotY:Math.PI*.85, rotX:-.1, rayon:m?7.6:6.4, duration:1.4},"c1");
   entree("ch1").forEach(([t,v])=>tl.to(t,v,"c1+=.7"));
@@ -687,6 +828,23 @@ function boucle(){
     const ang = L.orb + souris.lx*.08;
     camera.position.set(Math.sin(ang)*L.rayon, L.haut + souris.ly*.12, Math.cos(ang)*L.rayon);
     camera.lookAt(0,0,0);
+    // le sourire s'ouvre : les dents s'écartent et tombent, les gencives se retirent
+    const e = L.ecart;
+    sourire.visible = e < .97;
+    if (sourire.visible){
+      dentsSourire.forEach(d=>{
+        const k = Math.min(1, Math.max(0, e*1.25 - d.rnd*.25));
+        const dir = d.arc==="haut" ? 1 : -1;
+        d.m.position.set(d.x*(1+k*2.4), d.y + dir*k*(2.2+d.rnd*2), d.z + k*(1.5+d.rnd*3));
+        d.m.scale.setScalar(d.k0*(1-k*.6));
+        d.m.rotation.x = k*(d.rnd-.5)*3; 
+        d.m.visible = !(d.m===dent36 && L.ech>.08);
+      });
+      const eg = Math.min(1, e*1.6);
+      sourire.userData.gencives.forEach((gm,i)=>{ gm.scale.set(1-eg*.9, .75*(1-eg), 1-eg*.9); gm.visible = eg < .98; gm.position.y = (i?-1:1)*eg*.5; });
+      sourire.rotation.y = souris.lx*.12; sourire.rotation.x = -souris.ly*.06;
+    }
+    stage.visible = L.ech > .03;
     stage.position.set(L.tx, L.ty + (reduit?0:Math.sin(t*.7)*.04*L.spin), 0);
     stage.rotation.set(L.rotX, L.rotY + spinAcc, .08);
     stage.scale.setScalar(L.ech);
@@ -709,20 +867,36 @@ function boucle(){
 }
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ horloge.getDelta(); boucle(); } });
 
-let lance = false;
+let lance = false, entre = false;
+const tactile = matchMedia("(pointer: coarse)").matches;
+const consigne = document.getElementById("consigne"), preEtat = document.getElementById("pre-etat");
+const ecrireConsigne = txt=>{ consigne.innerHTML=txt.split(" ").map(m=>'<span class="mot">'+[...m].map(c=>'<span class="l">'+c+'</span>').join("")+'</span>').join(" "); return consigne.querySelectorAll(".l"); };
+ecrireConsigne(tactile ? "Glissez vers le haut pour avancer" : "Défilez pour avancer");
+if (lenis) lenis.stop();
+document.documentElement.style.overflow="hidden";
 manager.onProgress = (u,l,tot)=>{ const p=Math.round(l/tot*100); compteur.textContent=p; barre.style.width=p+"%"; };
+function entrer(){
+  if (entre) return; entre = true;
+  pre.classList.add("fini");
+  document.documentElement.style.overflow="";
+  if (lenis) lenis.start();
+  ScrollTrigger && ScrollTrigger.refresh();
+  if (reduit || !gsap) return;
+  L.rayon = 13;
+  gsap.timeline({defaults:{ease:"expo.out"}})
+    .from("#levres text",{opacity:0,y:40,duration:1.4,stagger:.12},.2)
+    .from("#ch0 .reperes, header, #defile",{opacity:0,duration:1},.8);
+}
 function entreeScene(){
   if (lance) return; lance = true;
-  if (!gsap) { pre.classList.add("fini"); return; }
+  if (!gsap) { entrer(); return; }
   const o = {v:+compteur.textContent||0};
   gsap.to(o,{v:100,duration:.9,ease:"power2.inOut",onUpdate:()=>{compteur.textContent=Math.round(o.v);barre.style.width=o.v+"%";},onComplete:()=>{
-    pre.classList.add("fini");
-    ScrollTrigger.refresh();
-    if (reduit) return;
-    L.rayon = 15; L.rotY = -Math.PI*1.6;
-    gsap.timeline({defaults:{ease:"expo.out"}})
-      .from("#ch0 .ligne > span",{yPercent:110,duration:1.3,stagger:.09},.4)
-      .from("#ch0 .reperes, header, #defile",{opacity:0,duration:1},1);
+    pre.classList.add("pret");
+    preEtat.textContent = "Prêt";
+    const ls = ecrireConsigne(tactile ? "Glissez pour entrer" : "Défilez pour entrer");
+    gsap.from(ls,{fontVariationSettings:'"wght" 800',opacity:.2,stagger:.025,duration:.6,ease:"power2.out"});
+    ["wheel","touchmove","keydown","click"].forEach(ev=>addEventListener(ev,entrer,{once:true,passive:true}));
   }});
 }
 const attente = setInterval(()=>{ if(dent){ clearInterval(attente); entreeScene(); } }, 60);
