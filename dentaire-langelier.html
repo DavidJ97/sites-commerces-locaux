@@ -411,7 +411,7 @@ main{position:relative;z-index:1}
    datamosh (Codrops 2 sept. 2026), Why Zero (Site du mois, sept. 2026) */
 .carte-soins{height:100vh;height:100svh;overflow:hidden;position:relative}
 .cs-gl{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.cs-grille{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(0,3.6fr) minmax(0,8.4fr);gap:clamp(32px,6vw,110px);padding:clamp(96px,13vh,130px) var(--g) clamp(92px,13vh,120px)}
+.cs-grille{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(0,3.6fr) minmax(0,8.4fr);grid-template-rows:auto minmax(0,1fr);column-gap:clamp(32px,6vw,110px);row-gap:clamp(10px,2vh,22px);padding:clamp(96px,13vh,130px) var(--g) clamp(92px,13vh,120px)}
 .cs-gauche{display:flex;flex-direction:column;justify-content:space-between;min-height:0}
 .cs-tete h2{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(1.7rem,2.6vw,2.8rem);line-height:1;letter-spacing:-.02em}
 .cs-tete p{margin-top:14px;max-width:28ch;color:var(--encre-douce);font-size:clamp(.95rem,1.05vw,1.05rem)}
@@ -425,16 +425,16 @@ main{position:relative;z-index:1}
 .cs-liste li.actif button{opacity:1}
 .cs-liste li.actif button::before{color:var(--gencive-fonce)}
 .cs-droite{display:flex;flex-direction:column;gap:clamp(14px,2.4vh,26px);min-height:0}
-.cs-cadre{position:relative;flex:1;min-height:0;overflow:hidden;background:#d9dfdc}
+.cs-cadre{position:relative;flex:1;min-height:0;overflow:hidden;background:#d9dfdc;margin-right:calc(-1 * var(--g))}
 .gl .cs-cadre{background:transparent;overflow:visible}
 .gl .cs-img{visibility:hidden}
 .cs-img{position:absolute;inset:0;margin:0;clip-path:inset(100% 0 0 0)}
 .cs-img.vu{clip-path:inset(0 0 0 0)}
 .cs-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(.25) contrast(1.18) brightness(.97)}
-.cs-urgence{background:var(--encre);color:var(--porcelaine);display:flex;flex-direction:column;justify-content:flex-end;gap:14px;padding:clamp(20px,3vw,40px)}
+.cs-urgence{background:linear-gradient(135deg,#F4C1A6,#E39C9B 55%,#C9706F);color:var(--encre);display:flex;flex-direction:column;justify-content:flex-end;gap:14px;padding:clamp(20px,3vw,40px)}
 .cs-urgence span{font-family:var(--serif);font-style:italic;font-size:clamp(2rem,3.6vw,3.8rem);line-height:1}
-.cs-urgence a{font-family:var(--large);font-variation-settings:"wdth" 140,"wght" 250;font-size:clamp(1.8rem,3vw,3.2rem);text-decoration:none;color:var(--gencive);align-self:flex-start;border-bottom:1px solid var(--gencive)}
-.cs-pied{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end}
+.cs-urgence a{font-family:var(--large);font-variation-settings:"wdth" 140,"wght" 250;font-size:clamp(1.8rem,3vw,3.2rem);text-decoration:none;color:var(--encre);align-self:flex-start;border-bottom:2px solid var(--encre)}
+.cs-pied{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:end}
 .cs-textes{position:relative;min-height:clamp(80px,11vh,110px)}
 .cs-texte{position:absolute;inset:0;opacity:0;transform:translateY(14px);transition:opacity .45s,transform .55s cubic-bezier(.2,.8,.2,1);pointer-events:none}
 .cs-texte.vu{opacity:1;transform:none;pointer-events:auto}
@@ -442,21 +442,21 @@ main{position:relative;z-index:1}
 .cs-texte .pour{font-size:.85rem;color:var(--encre-douce);display:flex;gap:16px;margin-top:10px}
 .cs-texte .pour b{font-weight:500;color:var(--encre)}
 .cs-texte a{color:var(--gencive-fonce)}
-.cs-compte{font-family:var(--large);font-variation-settings:"wdth" 55,"wght" 800;font-size:clamp(2.6rem,4.4vw,4.6rem);line-height:.8;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.cs-compte small{font-variation-settings:"wdth" 120,"wght" 300;font-size:.38em;color:var(--encre-douce);margin-left:4px}
+.cs-compte{position:absolute;z-index:3;right:clamp(16px,2.4vw,40px);top:0;transform:translateY(-34%);font-family:var(--large);font-variation-settings:"wdth" 50,"wght" 850;font-size:clamp(7rem,min(15vw,30vh),17rem);line-height:.8;font-variant-numeric:tabular-nums;letter-spacing:-.03em;color:var(--gencive);pointer-events:none;text-shadow:0 18px 40px rgba(19,32,28,.18)}
 .cs-jauge{height:2px;background:var(--trait)}
 .cs-jauge i{display:block;height:100%;background:var(--encre);transform-origin:left;transform:scaleX(0)}
 /* le nom du soin traverse l'écran et inverse l'image */
-.cs-geant{position:relative;z-index:2;color:var(--encre);pointer-events:none;font-family:var(--serif);font-weight:400;font-variation-settings:"opsz" 96;
-  font-size:clamp(2.4rem,min(4.8vw,8.4vh),5.6rem);line-height:.95;letter-spacing:-.04em;white-space:nowrap;min-height:1.1em}
+.cs-geant{grid-column:1/-1;position:relative;z-index:2;color:var(--encre);pointer-events:none;font-family:var(--serif);font-weight:400;font-variation-settings:"opsz" 96;
+  font-size:clamp(3rem,min(7.6vw,13vh),9.5rem);line-height:.95;letter-spacing:-.04em;white-space:nowrap;min-height:1.1em}
 .cs-geant .mot{display:inline-block;white-space:nowrap}
 .cs-geant .l{display:inline-block;will-change:transform}
 .cs-geant .rang{display:block;overflow:hidden;padding:.06em 0 .04em}
 @media (max-width:760px){
-  .cs-grille{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;gap:14px;padding-top:80px}
+  .cs-grille{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr) auto;gap:14px;padding-top:80px}
   .cs-tete p{display:none}
   .cs-gauche{display:contents}
-  .cs-tete{order:0}.cs-droite{order:1}.cs-liste{order:2}
+  .cs-tete{order:-1}.cs-geant{order:0}.cs-droite{order:1}.cs-liste{order:2}
+  .cs-compte{font-size:4.6rem;right:10px;top:10px;transform:none}
   .cs-liste button{padding:6px 0;font-size:1.05rem}
   .cs-cadre{flex:1}
   .cs-geant{font-size:9.2vw}
@@ -700,6 +700,7 @@ html.rd-ouvert{overflow:hidden}
   <!-- 2. vertical épinglé, les soins : la liste s'allume au défilement -->
   <section class="clair carte-soins" id="soins" aria-label="Nos soins" data-i18n-aria="aria.soins">
     <div class="cs-grille">
+      <div class="cs-geant" id="cs-geant" aria-hidden="true"></div>
       <div class="cs-gauche">
         <div class="cs-tete"><h2 data-i18n="soins.titre">Ce qu’on fait pour vous</h2><p data-i18n="soins.intro">Du premier rendez-vous de votre enfant au traitement plus complexe, tout se fait ici, avec la même équipe.</p></div>
         <ul class="cs-liste">
@@ -711,8 +712,8 @@ html.rd-ouvert{overflow:hidden}
         </ul>
       </div>
       <div class="cs-droite">
-        <div class="cs-geant" id="cs-geant" aria-hidden="true"></div>
         <div class="cs-cadre">
+          <span class="cs-compte" id="cs-compte" aria-hidden="true">01</span>
           <figure class="cs-img" data-i="0"><img data-photo="soins.0" data-i18n-alt="alt.0" src="https://images.unsplash.com/photo-1606811971618-4486d14f3f99?auto=format&fit=crop&w=1100&q=75" alt="Examen dentaire au miroir" loading="lazy"></figure>
           <figure class="cs-img" data-i="1"><img data-photo="soins.1" data-i18n-alt="alt.1" src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1100&q=75" alt="Dentiste qui lit des radiographies" loading="lazy"></figure>
           <figure class="cs-img" data-i="2"><img data-photo="soins.2" data-i18n-alt="alt.2" src="https://images.unsplash.com/photo-1758205307836-0829c799890b?auto=format&fit=crop&w=1100&q=75" alt="Dentiste qui examine les dents d’un jeune garçon" loading="lazy"></figure>
@@ -727,7 +728,6 @@ html.rd-ouvert{overflow:hidden}
           <div class="cs-texte" data-i="3"><p data-i18n="texte.3">On vous donne le prix avant de commencer et on vous aide avec votre assurance, y compris les régimes étudiants.</p><div class="pour"><span data-i18n="pour.3.l">Avant le soin</span><b data-i18n="pour.3">Prix annoncé</b></div></div>
           <div class="cs-texte" data-i="4"><p data-i18n="urgence.texte">Une dent cassée, une douleur soudaine : appelez au <a href="tel:+15142555511">514 255-5511</a>, on trouve une place rapidement.</p><div class="pour"><span data-i18n="pour.4.l">Même jour</span><b data-i18n="pour.4">Dans la mesure du possible</b></div></div>
         </div>
-          <span class="cs-compte" id="cs-compte">01<small>/ 05</small></span>
         </div>
         <div class="cs-jauge" aria-hidden="true"><i></i></div>
       </div>
@@ -1034,7 +1034,11 @@ html.rd-ouvert{overflow:hidden}
   const choisis=[];
   for(let r=0;r<6;r++) for(let c=0;c<cols;c++){ const i=document.createElement("i"); px.appendChild(i); if(Math.random()<probas[r]) choisis.push(i); }
   gsap.utils.shuffle(choisis.filter((_,k)=>k<choisis.length*.55)).slice(0,6).forEach(i=>i.classList.add("vif"));
-  gsap.to(gsap.utils.shuffle(choisis),{opacity:1,duration:.05,stagger:.003,ease:"none",scrollTrigger:{trigger:px,start:"top bottom",end:"bottom bottom",scrub:true}});
+  const rang=i=>Math.floor([...px.children].indexOf(i)/cols);
+  const ordre=choisis.map(i=>({i,k:(5-rang(i))+Math.random()*1.6})).sort((a,b)=>a.k-b.k).map(o=>o.i);
+  gsap.to(ordre,{opacity:1,duration:.05,stagger:.003,ease:"none",scrollTrigger:{trigger:px,start:"top bottom",end:"bottom bottom",scrub:true}});
+  // le texte du récit et les étiquettes s'effacent avant que les pixels montent
+  gsap.to("#recit .collant",{opacity:0,ease:"none",scrollTrigger:{trigger:px,start:"top bottom+=15%",end:"top 92%",scrub:true}});
 
   // en-tête qui se cache en descendant et revient en remontant
   const ent=document.getElementById("entete"); let dernier=0;
@@ -1074,7 +1078,10 @@ html.rd-ouvert{overflow:hidden}
       if(i===actif) return; const prec=actif; actif=i;
       lis.forEach((l,k)=>l.classList.toggle("actif",k===i));
       txts.forEach((t,k)=>t.classList.toggle("vu",k===i));
-      compte.firstChild.nodeValue=String(i+1).padStart(2,"0");
+      compte.textContent=String(i+1).padStart(2,"0");
+      compte.style.color = i===n-1 ? "var(--encre)" : "";
+      const base = innerWidth<760 ? 0 : -34;
+      if(prec>=0) gsap.fromTo(compte,{yPercent:(prec<i?45:-45)+base,opacity:0},{yPercent:base,opacity:1,duration:.7,ease:"expo.out",overwrite:true});
       const sens = prec<i ? 1 : -1;
       if(tlTitre) tlTitre.kill();
       const anciennes=geant.querySelectorAll(".l");
@@ -1230,11 +1237,11 @@ const decor = new THREE.Mesh(new THREE.PlaneGeometry(22, 12.375), new THREE.Shad
       float c=caustique(p,uT);
       float centre=smoothstep(1.15,0.,length((uv-vec2(.6,.5))*vec2(1.5,1.)));
       vec3 col=mix(vec3(.002,.008,.009),vec3(.014,.05,.053),centre);
-      col+=vec3(.3,.7,.7)*c*.045*(.15+.85*centre);
+      col+=vec3(.3,.7,.7)*c*.02*(.1+.9*centre);
       float m=0.;for(int i=0;i<8;i++){float a=float(i)*.7854;m+=texture2D(uTexte,uv+vec2(cos(a),sin(a))*.0026).r;}m/=8.;
       float bord=clamp(m*(1.-m)*4.,0.,1.);
-      col=mix(col,col+vec3(.012,.036,.038)+vec3(.4,.9,.9)*c*.08,m*.9);
-      col+=vec3(.5,.9,.9)*bord*.018;
+      col=mix(col,col+vec3(.01,.03,.032)+vec3(.4,.9,.9)*c*.035,m*.75);
+      col+=vec3(.5,.9,.9)*bord*.01;
       col+=vec3(.95,.42,.42)*.03*smoothstep(.85,0.,length(uv-vec2(.98,.02)));
       gl_FragColor=vec4(col,1.);}`
 }));
@@ -1615,12 +1622,16 @@ import * as THREE from "three";
   const loader=new THREE.TextureLoader(); loader.setCrossOrigin("anonymous");
   const tex=[], asp=[]; let charges=0, echec=false;
   function panneauUrgence(){
+    // panneau d'urgence aux couleurs du bouton de rendez-vous : rose, encre, onde d'appel
     const c=document.createElement("canvas"); c.width=1600; c.height=1000; const g=c.getContext("2d");
-    g.fillStyle="#13201C"; g.fillRect(0,0,c.width,c.height);
-    g.strokeStyle="rgba(227,156,155,.32)"; g.lineWidth=2; for(let i=0;i<16;i++){ g.beginPath(); g.arc(1180,430,60+i*44,0,Math.PI*2); g.stroke(); }
-    g.fillStyle="#E39C9B"; g.beginPath(); g.arc(1180,430,22,0,Math.PI*2); g.fill();
-    g.fillStyle="#EDF0EE"; g.textAlign="left"; g.font='italic 400 150px "Bodoni Moda", Didot, Georgia, serif'; g.fillText(SITE.t("urgence.titre"),110,520);
-    g.fillStyle="#E39C9B"; g.font='300 104px Anybody, system-ui, sans-serif'; g.fillText(CLINIQUE.telephone,114,690);
+    const fond=g.createLinearGradient(0,0,1600,1000); fond.addColorStop(0,"#F4C1A6"); fond.addColorStop(.55,"#E39C9B"); fond.addColorStop(1,"#C9706F");
+    g.fillStyle=fond; g.fillRect(0,0,c.width,c.height);
+    for(let i=0;i<9;i++){ g.strokeStyle="rgba(42,20,20,"+(.16-i*.015)+")"; g.lineWidth=3; g.beginPath(); g.arc(1270,300,70+i*70,0,Math.PI*2); g.stroke(); }
+    g.fillStyle="#2A1414"; g.beginPath(); g.arc(1270,300,26,0,Math.PI*2); g.fill();
+    g.fillStyle="#13201C"; g.textAlign="left";
+    g.font='italic 400 190px "Bodoni Moda", Didot, Georgia, serif'; g.fillText(SITE.t("urgence.titre"),100,640);
+    g.font='600 118px Anybody, system-ui, sans-serif'; g.fillText(CLINIQUE.telephone,104,830);
+    g.fillRect(104,860,g.measureText(CLINIQUE.telephone).width,5);
     const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
   }
   sources.forEach((src,i)=>{
